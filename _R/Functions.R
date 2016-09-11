@@ -9,5 +9,7 @@ getDescendants<-function(tree,node,curr=NULL){
   w<-which(daughters>=length(tree$tip))
   if(length(w)>0) for(i in 1:length(w)) 
     curr<-getDescendants(tree,daughters[w[i]],curr)
+    ll = length(tree$tip.label)
+    curr<-curr[which(curr <= ll)]
   
   return(curr) }
