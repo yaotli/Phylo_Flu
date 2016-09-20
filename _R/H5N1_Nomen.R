@@ -145,7 +145,9 @@ rmdup<-function(file){
 #     1. Original fasta for the tree
 #     2. .csv file with well-aligned SUBtree tip labels
 #     3. Packages: bioconductor::seqinr
+#     4. Be sure that all tip names are in ''
 
+subtreseq()
 
 subtreseq<-function(){
   
@@ -170,11 +172,15 @@ subtreseq<-function(){
   if( any(NA %in% id.subtree) == "TRUE"){
     
     bug = which(is.na(id.subtree))
-    checkpoint = length(grep(name.subtree[bug], seq.name0[bug.id]))
     
-    if (  (checkpoint >= 1) & (checkpoint == length(bug) ) ){
+    match.id = c()
+    for(i in 1: length(bug)){
+      match = grep(name.subtree[bug][i], seq.name0[bug.id])
+      if ( length(match) == 1 ){ match.id[length(match.id) + 1] = match} }
+    
+    if (  ( length(match.id) >= 1) & ( length(match.id) == length(bug) ) ){
       
-      id.subtree[bug] = bug.id[grep(name.subtree[bug], seq.name0[bug.id])]
+      id.subtree[bug] = bug.id[match.id]
       
       
       seq.name0.subtree = seq.name0[id.subtree]
@@ -185,8 +191,9 @@ subtreseq<-function(){
       print("Done")
       
       
-    }else(
-      print(name.subtree[which(id.subtree %in% NA)]))  } else{
+    }else{
+      problem=c(bug, name.subtree[bug])
+      print( problem ) }  } else{
         
         seq.name0.subtree = seq.name0[id.subtree]
         seq0.subtree = seq0[id.subtree]
@@ -196,7 +203,6 @@ subtreseq<-function(){
         print("Done")
         
       } }
-
 
 subtreseq2<-function(){
   
@@ -221,11 +227,15 @@ subtreseq2<-function(){
   if( any(NA %in% id.subtree) == "TRUE"){
     
     bug = which(is.na(id.subtree))
-    checkpoint = length(grep(name.subtree[bug], seq.name0[bug.id]))
     
-    if (  (checkpoint >= 1) & (checkpoint == length(bug) ) ){
+    match.id = c()
+    for(i in 1: length(bug)){
+      match = grep(name.subtree[bug][i], seq.name0[bug.id])
+      if ( length(match) == 1 ){ match.id[length(match.id) + 1] = match} }
+    
+    if (  ( length(match.id) >= 1) & ( length(match.id) == length(bug) ) ){
       
-      id.subtree[bug] = bug.id[grep(name.subtree[bug], seq.name0[bug.id])]
+      id.subtree[bug] = bug.id[match.id]
       
       
       seq.name0.subtree = seq.name0[id.subtree]
@@ -237,12 +247,11 @@ subtreseq2<-function(){
       write.fasta(seq0.subtree, file.out = "subtree.fasta", names = seq.name0.subtree)
       write.fasta(seq2.subtree, file.out = "remain.fasta", names = seq.name2.subtree)
       
-      
       print("Done")
       
-      
-    }else(
-      print(name.subtree[which(id.subtree %in% NA)]))  } else{
+    }else{
+      problem=c(bug, name.subtree[bug])
+      print( problem ) }  } else{
         
         seq.name0.subtree = seq.name0[id.subtree]
         seq0.subtree = seq0[id.subtree]
@@ -253,10 +262,10 @@ subtreseq2<-function(){
         write.fasta(seq0.subtree, file.out = "subtree.fasta", names = seq.name0.subtree)
         write.fasta(seq2.subtree, file.out = "remain.fasta", names = seq.name2.subtree)
         
-        
         print("Done")
         
       } }
 
 
+subtreseq2()
 
