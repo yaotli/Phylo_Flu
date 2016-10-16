@@ -2,12 +2,11 @@ source("https://bioconductor.org/biocLite.R")
 biocLite()
 
 biocLite("phytools")
-
 library(seqinr)
 
 
 cb10112aligntrimul = read.fasta(file.choose())
-attributes(cb10112aligntrimul)$names              # list the seq
+attributes(cb10112aligntrimul)$names                         # list the seq
 
 seq.name = attributes(cb10112aligntrimul)$names              # list the seq
 mx = getSequence(cb10112aligntrimul)
@@ -16,7 +15,7 @@ table.name = cbind(seq.name, Seq.name.no)
 
 # 4952, 4953
 
-Seq.name.no = c(1:4951, "GSGD", 4953:length(seq.name))    # assign the numbering
+Seq.name.no = c(1:4951, "GSGD", 4953:length(seq.name))       # assign the numbering
 write.fasta(mx, file.out = "cb10112aligntrimul.fas", names = Seq.name.no)
 
 
@@ -38,7 +37,7 @@ getDescendants<-function(tree,node,curr=NULL){
 library(phytools)
 cb10112aligntrimul.tree=read.tree(file.choose())
 cb10112aligntrimul.tree$tip.label      # 1921
-# 1264 for tip3668
+                                       # 1264 for tip3668
 edge.cb10112aligntrimul.tree = cb10112aligntrimul.tree$edge  
 
 length(getDescendants(cb10112aligntrimul.tree, 11887))  # 11887 with 8195 descendant tips
@@ -58,9 +57,6 @@ write.fasta(submx, file.out = "R8849.fas", names = sub.seq.name)
 
 
 #######
-
-
-
 
 tobedelect=c()
 for(i in 1: length(submx)){
@@ -112,7 +108,7 @@ write.fasta(submx4102, file.out = "R_sub4102.fas", names = submx4102.name)
 
 
 
-rmdup<-function(file){
+cleantip<-function(file){
   
   library(seqinr) 
   
@@ -125,18 +121,24 @@ rmdup<-function(file){
   
   ls.name0 = as.list(seq.name0[duplicated.id])
   ls.name = sapply(ls.name0, function(x){ paste0(x[1], "b")   })
-  
   seq.name0[duplicated.id] = ls.name
   
-  write.fasta(seq0, file.out = "noduplicated.fasta", names = seq.name0)
+  seq.name0 = gsub("\\(", "-", seq.name0   )
+  seq.name0 = gsub("\\)", "-", seq.name0   )
+  seq.name0 = gsub("\\[", "/", seq.name0   )
+  seq.name0 = gsub("\\]", "/", seq.name0   )
+  seq.name0 = gsub(" ", "_", seq.name0   )
+  seq.name0 = gsub("\\'", "", seq.name0   )
+  
+  
+  
+  write.fasta(seq0, file.out = "cleanTip.fasta", names = seq.name0)
   
   print("Done")
   
 }
 
-
-
-# rmdup()
+# cleantip()
 
 
 ########## Subtree seq extraction ########## 
@@ -147,7 +149,6 @@ rmdup<-function(file){
 #     3. Packages: bioconductor::seqinr
 #     4. Be sure that all tip names are in ''
 
-subtreseq()
 
 subtreseq<-function(){
   
@@ -161,13 +162,13 @@ subtreseq<-function(){
   sub.tree=read.csv(file.choose())
   
   tipslabel.subtree0 = as.character(sub.tree[,1])
-  startno = which(tipslabel.subtree0 == "\ttaxlabels") + 1
-  endno = head(which(tipslabel.subtree0 == ";"), 1) -1
+  startno = which( tipslabel.subtree0 == "\ttaxlabels" ) + 1
+  endno = head( which(tipslabel.subtree0 == ";"), 1 ) - 1
   
-  tipslabel.subtree = tipslabel.subtree0[startno:endno]
+  tipslabel.subtree = tipslabel.subtree0[ startno:endno ]
   
   name.subtree = sapply(strsplit(tipslabel.subtree, split = "'", fixed = T), function(x)x[2])
-  id.subtree= match(name.subtree, seq.name0)
+  id.subtree = match(name.subtree, seq.name0)
   
   if( any(NA %in% id.subtree) == "TRUE"){
     
@@ -192,7 +193,7 @@ subtreseq<-function(){
       
       
     }else{
-      problem=c(bug, name.subtree[bug])
+      problem = c(bug, name.subtree[bug])
       print( problem ) }  } else{
         
         seq.name0.subtree = seq.name0[id.subtree]
@@ -203,6 +204,9 @@ subtreseq<-function(){
         print("Done")
         
       } }
+
+# subtreseq()
+
 
 subtreseq2<-function(){
   
@@ -250,7 +254,7 @@ subtreseq2<-function(){
       print("Done")
       
     }else{
-      problem=c(bug, name.subtree[bug])
+      problem = c(bug, name.subtree[bug])
       print( problem ) }  } else{
         
         seq.name0.subtree = seq.name0[id.subtree]
@@ -266,6 +270,40 @@ subtreseq2<-function(){
         
       } }
 
+# subtreseq2()
 
-subtreseq2()
+
+
+
+##########
+#
+
+toNotip<-function(file){
+  
+  library(seqinr) 
+  
+  file = read.fasta(file.choose())
+  
+  seq.name0 = attributes(file)$names
+  seq0 = getSequence(file)
+  
+  duplicated.id = which(duplicated(seq.name0) == "TRUE")
+  
+  ls.name0 = as.list(seq.name0[duplicated.id])
+  ls.name = sapply(ls.name0, function(x){ paste0(x[1], "b")   })
+  seq.name0[duplicated.id] = ls.name
+  
+  ls.name1 = seq(1:length(seq.name0))
+  
+  write.fasta(seq0, file.out = "noduplicated.fasta", names = ls.name1)
+  return(seq.name0)
+  
+  
+  print("Done")
+  
+}
+
+# toNotip()
+
+
 
