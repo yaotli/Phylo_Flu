@@ -17,37 +17,127 @@ getDescendants<-function(tree,node,curr=NULL){
 
 ##### 
 
-########## Arrange duplicated name ########## 
+########## Clean tree IDs ########## 
 
-cleantip<-function(file){
+# require package seqinr and stringr
+# deal with duplicated, problematic string and extract info
+# fill the date info with either -15 or -99-99
+
+
+IDcleaner <- function(){
   
-  library(seqinr) 
+  library(seqinr)
+  library(stringr)
   
   file = read.fasta(file.choose())
   
-  seq.name0 = attributes(file)$names
+  seq_name0 = attributes(file)$names
   seq0 = getSequence(file)
   
-  duplicated.id = which(duplicated(seq.name0) == "TRUE")
   
-  ls.name0 = as.list(seq.name0[duplicated.id])
-  ls.name = sapply(ls.name0, function(x){ paste0(x[1], "b")   })
-  seq.name0[duplicated.id] = ls.name
+  # Deal with problematic string
   
-  seq.name0 = gsub("\\(", "-", seq.name0   )
-  seq.name0 = gsub("\\)", "-", seq.name0   )
-  seq.name0 = gsub("\\[", "/", seq.name0   )
-  seq.name0 = gsub("\\]", "/", seq.name0   )
-  seq.name0 = gsub(" ", "_", seq.name0   )
-  seq.name0 = gsub("\\'", "", seq.name0   )
+  seq_name = gsub(" ", "_", seq_name0)
+  
+  seq_name = gsub("\\(", "-", seq_name)
+  seq_name = gsub("\\)", "-", seq_name)
+  seq_name = gsub("\\[", "-", seq_name)
+  seq_name = gsub("\\]", "-", seq_name)
+  
+  seq_name = gsub("\\'", "", seq_name)
+  seq_name = gsub(">", "", seq_name)  
+  seq_name = gsub("\\.", "-", seq_name)  
   
   
+  # Dissect the string
   
-  write.fasta(seq0, file.out = "cleanTip.fasta", names = seq.name0)
+  seq_name = gsub("_-Month_and_day_unknown-", "-99-99", seq_name)
+  seq_name = gsub("_-Day_unknown-", "-15", seq_name)
   
-  print("Done")
+  # Time
+  
+  d = "([0-9]{4})-([0-9]{2})-([0-9]{2})"
+  
+  time_raw <- str_match(seq_name, d)[,1]
+  
+  # Site of isolate
+  
+  s = "A/([A-Za-z0-9-_]+)/"
+  
+  site <- str_match(seq_name, s)[,2]
+  
+  
+  # Deal with replicated
+  
+  duplicated_id = which(duplicated(seq_name) == "TRUE")
+  duplicated_note = duplicated(seq_name)
+  
+  # loop for each replicated case
+  
+  if( length(duplicated_id) > 0 ){
+    
+    # for all the duplicated id
+    
+    for (i in 1: length(duplicated_id)){
+      
+      dup0 = which(match(seq_name, seq_name[duplicated_id[i]]) != "NA")
+      
+      # create a null vector to appendex  
+      
+      app = c("a_", "b_", "c_", "d_", "e_", "f_", "g_", "h_", "i_", "j_")
+      
+      ap.id = seq_name[dup0]
+      app.id = c()
+      
+      # loop to deal with multiple replicated
+      # find the date info, insert labeling in the middle
+      
+      time_rep <- str_match(ap.id, d)[,1]
+      
+      for (k in 1: length(ap.id)){
+        
+        app.id[k] = sub(time_rep[k], paste0(app[k], time_rep[k]), ap.id[k])
+      }
+      
+      # back to seq_name0  
+      
+      seq_name[dup0] = app.id
+      
+    }
+  }     
+  
+  duplicated_id_ed = which(duplicated(seq_name) == "TRUE")
+  
+  
+  if (length(duplicated_id_ed) > 0 ){
+    
+print("ERROR") 
+    
+  }else{
+    
+    # write fasta file
+    
+    write.fasta(seq0, 
+                file.out = "~/Desktop/IDcleaner.fasta", 
+                names = seq_name)
+    
+    # dataframe output
+    
+    identicalID = as.character(duplicated_note)
+    
+    fastaInfo <- data.frame(no = seq(1:length(seq_name)),seq_name, site, time_raw, identicalID)
+    
+    
+return(fastaInfo)
+print("DONE")
+    
+  }
   
 }
+
+
+
+
 
 ########## Subtree seq extraction ########## 
 
