@@ -19,6 +19,7 @@ getDescendants<-function(tree,node,curr=NULL){
 
 ########## Clean tree IDs ########## 
 
+# should follow strict ID arrangement before download .fasta file
 # require package seqinr and stringr
 # deal with duplicated, problematic string and extract info
 # fill the date info with either -15 or -99-99
@@ -134,10 +135,6 @@ print("DONE")
   }
   
 }
-
-
-
-
 
 ########## Subtree seq extraction ########## 
 
