@@ -1,5 +1,5 @@
-##### getDescendants (from http://blog.phytools.org; 20120126)
-#
+# getDescendants (from http://blog.phytools.org; 20120126) #####
+
 
 getDescendants<-function(tree,node,curr=NULL){
   
@@ -15,9 +15,8 @@ getDescendants<-function(tree,node,curr=NULL){
   return(curr) }
 
 
-##### 
 
-########## Clean tree IDs ########## 
+# Clean tree IDs ####
 
 # should follow strict ID arrangement before download .fasta file
 # require package seqinr and stringr
@@ -25,7 +24,7 @@ getDescendants<-function(tree,node,curr=NULL){
 # fill the date info with either -15 or -99-99
 
 
-IDcleaner <- function(){
+cleanID <- function(){
   
   library(seqinr)
   library(stringr)
@@ -33,7 +32,7 @@ IDcleaner <- function(){
   file = read.fasta(file.choose())
   
   seq_name0 = attributes(file)$names
-  seq0 = getSequence(file)
+       seq0 = getSequence(file)
   
   
   # Deal with problematic string
@@ -50,7 +49,8 @@ IDcleaner <- function(){
   seq_name = gsub("\\.", "-", seq_name)  
   
   
-  # Dissect the string
+  # Dissect the string 
+  # for GISAID
   
   seq_name = gsub("_-Month_and_day_unknown-", "-99-99", seq_name)
   seq_name = gsub("_-Day_unknown-", "-15", seq_name)
@@ -70,7 +70,7 @@ IDcleaner <- function(){
   
   # Deal with replicated
   
-  duplicated_id = which(duplicated(seq_name) == "TRUE")
+    duplicated_id = which(duplicated(seq_name) == "TRUE")
   duplicated_note = duplicated(seq_name)
   
   # loop for each replicated case
@@ -87,7 +87,7 @@ IDcleaner <- function(){
       
       app = c("a_", "b_", "c_", "d_", "e_", "f_", "g_", "h_", "i_", "j_")
       
-      ap.id = seq_name[dup0]
+       ap.id = seq_name[dup0]
       app.id = c()
       
       # loop to deal with multiple replicated
@@ -119,7 +119,7 @@ print("ERROR")
     # write fasta file
     
     write.fasta(seq0, 
-                file.out = "~/Desktop/IDcleaner.fasta", 
+                file.out = "~/Desktop/cleanID.fasta", 
                 names = seq_name)
     
     # dataframe output
@@ -136,7 +136,7 @@ print("DONE")
   
 }
 
-########## Subtree seq extraction ########## 
+# Subtree seq extraction #####
 
 
 subtreseq<-function(){
@@ -257,8 +257,7 @@ subtreseq2<-function(){
       } }
 
 
-##########
-#
+# Turn tip names into number ######
 
 toNotip<-function(file){
   
@@ -284,3 +283,104 @@ toNotip<-function(file){
   print("Done")
   
 }
+
+
+# Curate the seq ####
+
+
+curateSeq <- function(maxamb, minseq, seqrep){
+  
+  library(seqinr)
+  library(stringr)
+  
+  file = read.fasta(file.choose())
+  
+  seq_name0 = attributes(file)$names
+  seq0 = getSequence(file)
+  
+  # null vector for seq to-be-delect  
+  
+  tobedelect1 = c()
+  tobedelect2 = c()
+  
+  for(i in 1: length(seq0)){
+    
+    ATCG = c("a", "t", "c", "g")
+    
+    # convert character to string
+    
+    seq_0 = c2s(seq0[[i]])
+    seq_i = gsub("-", "", seq_0)
+    
+    # seq length and number of ambiguous nucleotide
+    
+    seqlth = length( s2c(seq_i) )
+    amb = length( which( s2c(seq_i) %in% ATCG == "FLASE") )
+    
+    if( ( seqlth < minseq ) | ( amb > maxamb ) ){
+      
+      tobedelect1[length(tobedelect1) + 1 ] = i
+      
+    }
+    
+  }
+  
+  print(length(tobedelect1))
+  
+  # Deal with seq duplication - tobedelect2
+  
+  if(seqrep == 1){
+    
+    dup = duplicated(sapply(seq0, 
+                            function(x){
+                              
+                              y = c2s(x)
+                              z = gsub("-", "", y)
+                              return(z)
+                            }
+    ))
+    
+    tobedelect2 <- which(dup == "TRUE")
+    
+    
+  }
+  
+  print(length(tobedelect2))
+  
+  tobedelect <- sort( unique( c(tobedelect1, tobedelect2) ) )
+  ramain <- seq(1:length(seq0))[-tobedelect]
+  
+  seq_name_out = seq_name0[ramain]
+  seq_out = seq0[ramain]
+  
+  # write fasta file
+  
+  write.fasta(seq_out, 
+              file.out = "~/Desktop/curateSeq.fasta", 
+              names = seq_name_out)           
+  
+  # extract fastaInfo
+  # Time
+  
+  d = "([0-9]{4})-([0-9]{2})-([0-9]{2})"
+  
+  time_raw <- str_match(seq_name_out, d)[,1]
+  
+  # Site of isolate
+  
+  s = "A/([A-Za-z0-9-_]+)/"
+  
+  site <- str_match(seq_name_out, s)[,2]       
+  
+  fastaInfo <- data.frame(no = seq(1:length(seq_name_out)), seq_name_out, site, time_raw)
+  
+  
+  return(fastaInfo)
+  print("DONE")  
+  
+}
+
+
+
+
+
