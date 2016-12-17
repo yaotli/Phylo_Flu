@@ -315,7 +315,7 @@ curateSeq <- function(maxamb, minseq, seqrep){
     # seq length and number of ambiguous nucleotide
     
     seqlth = length( s2c(seq_i) )
-    amb = length( which( s2c(seq_i) %in% ATCG == "FLASE") )
+       amb = length( which( s2c(seq_i) %in% ATCG == "FLASE") )
     
     if( ( seqlth < minseq ) | ( amb > maxamb ) ){
       
@@ -345,19 +345,19 @@ curateSeq <- function(maxamb, minseq, seqrep){
     
   }
   
-  print(length(tobedelect2))
+print(length(tobedelect2))
   
   tobedelect <- sort( unique( c(tobedelect1, tobedelect2) ) )
   ramain <- seq(1:length(seq0))[-tobedelect]
   
   seq_name_out = seq_name0[ramain]
-  seq_out = seq0[ramain]
+       seq_out = seq0[ramain]
   
   # write fasta file
   
-  write.fasta(seq_out, 
-              file.out = "~/Desktop/curateSeq.fasta", 
-              names = seq_name_out)           
+write.fasta(seq_out, 
+            file.out = "~/Desktop/curateSeq.fasta", 
+            names = seq_name_out)           
   
   # extract fastaInfo
   # Time
@@ -374,9 +374,8 @@ curateSeq <- function(maxamb, minseq, seqrep){
   
   fastaInfo <- data.frame(no = seq(1:length(seq_name_out)), seq_name_out, site, time_raw)
   
-  
-  return(fastaInfo)
-  print("DONE")  
+print("DONE")  
+return(fastaInfo)
   
 }
 
