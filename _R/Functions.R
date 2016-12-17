@@ -343,41 +343,51 @@ print(length(tobedelect1))
 print(length(tobedelect2))
 
   if (seqrep == 0){
+
+return(seq_name0[tobedelect2])
     
     tobedelect2 = c()
+    
   }  
 
-  
-  tobedelect <- sort( unique( c(tobedelect1, tobedelect2) ) )
-  ramain <- seq(1:length(seq0))[-tobedelect]
-  
-  seq_name_out = seq_name0[ramain]
-       seq_out = seq0[ramain]
-  
-  # write fasta file
-  
+  if ( ( length(tobedelect1) + length(tobedelect2) ) > 0){
+    
+    tobedelect <- sort( unique( c(tobedelect1, tobedelect2) ) )
+        ramain <- seq(1:length(seq0))[-tobedelect]
+    
+    seq_name_out = seq_name0[ramain]
+         seq_out = seq0[ramain]
+    
+    # write fasta file
+    
 write.fasta(seq_out, 
             file.out = "~/Desktop/curateSeq.fasta", 
             names = seq_name_out)           
-  
-  # extract fastaInfo
-  # Time
-  
-  d = "([0-9]{4})-([0-9]{2})-([0-9]{2})"
-  
-  time_raw <- str_match(seq_name_out, d)[,1]
-  
-  # Site of isolate
-  
-  s = "A/([A-Za-z0-9-_]+)/"
-  
-  site <- str_match(seq_name_out, s)[,2]       
-  
-  fastaInfo <- data.frame(no = seq(1:length(seq_name_out)), seq_name_out, site, time_raw)
-  
+    
+    # extract fastaInfo
+    # Time
+    
+    d = "([0-9]{4})-([0-9]{2})-([0-9]{2})"
+    
+    time_raw <- str_match(seq_name_out, d)[,1]
+    
+    # Site of isolate
+    
+    s = "A/([A-Za-z0-9-_]+)/"
+    
+    site <- str_match(seq_name_out, s)[,2]       
+    
+    fastaInfo <- data.frame(no = seq(1:length(seq_name_out)), seq_name_out, site, time_raw)
+    
 print("DONE")  
 return(fastaInfo)
-  
+    
+    
+  }else{
+    
+print("DONE")
+  }
+
 }
 
 
