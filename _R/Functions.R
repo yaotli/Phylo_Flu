@@ -390,7 +390,44 @@ print("DONE")
 
 }
 
+# To no redundant .fasta ####
 
+tonoredundant <- function(){
+  
+  file = read.fasta(file.choose())
+  
+  seq_name0 = attributes(file)$names
+  seq0 = getSequence(file)
+  
+  # duplicated id
+  duplicated_id = which(duplicated(seq_name0) == "TRUE")
+  
+  # duplicated seq
+  dup = duplicated(sapply(seq0, 
+                          function(x){
+                            
+                            y = c2s(x)
+                            z = gsub("-", "", y)
+                            return(z)
+                          }
+  ))
+  
+  tobedelect <- which(dup == "TRUE")
+  
+  # take intersection
+  toberemoveid <- intersect(duplicated_id, tobedelect)
+  ramain <- seq(1:length(seq0))[-toberemoveid]
+  
+  seq_name_out = seq_name0[ramain]
+  seq_out = seq0[ramain] 
+  
+  write.fasta(seq_out, 
+              file.out = "~/Desktop/nonredundant.fasta", 
+              names = seq_name_out)         
+  
+  print(seq_name0[toberemoveid])    
+  
+}
 
 
 
