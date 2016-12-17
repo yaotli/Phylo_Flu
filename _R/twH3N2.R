@@ -1,59 +1,61 @@
 library(seqinr) 
 
-# Read-in files
+# ID cleaning ####
 
-gisaidGB <- read.fasta("/Users/yaosmacbook/Desktop/twH3N2/gisaid_gb_4898.fasta")
-gisaidTW <- read.fasta("/Users/yaosmacbook/Desktop/twH3N2/gisaid_tw_131.fasta")
-  ncbiTW <- read.fasta("/Users/yaosmacbook/Desktop/twH3N2/ncbi_tw_31.fasta")
-
-
-# ID cleaning for GISAID
-  
-file = gisaidGB
-
-seq_name0 = attributes(file)$names
-     seq0 = getSequence(file)
-
-     
-# Deal with replicated ID
-     
-duplicated_id = which(duplicated(seq_name0) == "TRUE")
-
-if( length(duplicated_id) > 0 ){
-  
-  # for all the duplicated id
-  
-  for (i in 1: length(duplicated_id)){
-    
-    dup0 = which(match(seq_name0, seq_name0[duplicated_id[i]]) != "NA")
-    
-    # create a null vector to appendex  
-    
-     app = c("", "_b", "_c", "_d", "_e", "_f", "_g", "_h", "_i", "_j")
-     
-     ap.id = seq_name0[dup0]
-    app.id = c()
-    
-    # loop to deal with multiple replicated
-    
-    for (k in 1: length(ap.id)){
-      
-      app.id[k] = paste0(ap.id[k], app[k])
-      
-    }
-    
-    # back to seq_name0  
-    
-    seq_name0[dup0] = app.id
-    
-  }
-}     
-     
-     
-
-# Deal with 
-     
+   gisaidh3 <- cleanID()
+pooledh3_tw <- cleanID()
 
 
+# seq curation ####
 
-     
+# maxamb = 5, minseq = 1500, replicates are allowed in TW data
+# 1647 / 15 reps
+
+    gisaidh3_cr <- curateSeq(5, 1500, 1)
+ pooledh3_tw_cr <- curateSeq(5, 1500, 0)
+ 
+ 
+# align and trim
+# remove apparent duplicated data (Taiwan)
+ 
+library(seqinr)
+library(stringr)
+ 
+ # read in 
+ file = read.fasta(file.choose())
+ 
+ seq_name0 = attributes(file)$names
+      seq0 = getSequence(file)
+ 
+   toberemove <- pooledh3_tw_cr[-(8:11)]
+ toberemoveid <-match(toberemove, seq_name0)
+ 
+ ramain <- seq(1:length(seq0))[-toberemoveid]
+ 
+ seq_name_out = seq_name0[ramain]
+      seq_out = seq0[ramain] 
+ 
+ write.fasta(seq_out, 
+             file.out = "~/Desktop/out_seq.fasta", 
+             names = seq_name_out)         
+ 
+ 
+ # deal with replated between TW from gisaid pool
+ # since ERROR from FastTree, remove additional 6 seqs
+ # resulting file: allpooled_trim_mo2
+ 
+ tonoredundant()
+ 
+ 
+# 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
