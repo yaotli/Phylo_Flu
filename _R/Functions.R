@@ -325,12 +325,10 @@ curateSeq <- function(maxamb, minseq, seqrep){
     
   }
   
-  print(length(tobedelect1))
+print(length(tobedelect1))
   
   # Deal with seq duplication - tobedelect2
   
-  if(seqrep == 1){
-    
     dup = duplicated(sapply(seq0, 
                             function(x){
                               
@@ -342,10 +340,13 @@ curateSeq <- function(maxamb, minseq, seqrep){
     
     tobedelect2 <- which(dup == "TRUE")
     
-    
-  }
-  
 print(length(tobedelect2))
+
+  if (seqrep == 0){
+    
+    tobedelect2 = c()
+  }  
+
   
   tobedelect <- sort( unique( c(tobedelect1, tobedelect2) ) )
   ramain <- seq(1:length(seq0))[-tobedelect]
