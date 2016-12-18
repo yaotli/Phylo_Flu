@@ -286,7 +286,8 @@ toNotip<-function(file){
 
 
 # Curate the seq ####
-
+# seqrep = 0 remove identical seq
+# seqrep = 1 remove all seq with the same nt. info
 
 curateSeq <- function(maxamb, minseq, seqrep){
   
@@ -296,7 +297,7 @@ curateSeq <- function(maxamb, minseq, seqrep){
   file = read.fasta(file.choose())
   
   seq_name0 = attributes(file)$names
-  seq0 = getSequence(file)
+       seq0 = getSequence(file)
   
   # null vector for seq to-be-delect  
   
@@ -315,7 +316,7 @@ curateSeq <- function(maxamb, minseq, seqrep){
     # seq length and number of ambiguous nucleotide
     
     seqlth = length( s2c(seq_i) )
-       amb = length( which( s2c(seq_i) %in% ATCG == "FLASE") )
+       amb = length( which(! s2c(seq_i) %in% ATCG ) )
     
     if( ( seqlth < minseq ) | ( amb > maxamb ) ){
       
@@ -329,34 +330,73 @@ print(length(tobedelect1))
   
   # Deal with seq duplication - tobedelect2
   
-    dup = duplicated(sapply(seq0, 
-                            function(x){
-                              
-                              y = c2s(x)
-                              z = gsub("-", "", y)
-                              return(z)
-                            }
-    ))
-    
-    tobedelect2 <- which(dup == "TRUE")
-    
+  dup = duplicated(sapply(seq0, 
+                          function(x){
+                            
+                            y = c2s(x)
+                            z = gsub("-", "", y)
+                            return(z)
+                          }
+  ))
+  
+  tobedelect2 <- which(dup == "TRUE")
+  
 print(length(tobedelect2))
-
+  
+  # find out identical seq
+  
   if (seqrep == 0){
-
-return(seq_name0[tobedelect2])
     
-    tobedelect2 = c()
+    # Strain name
     
-  }  
-
+    n <- "A/([A-Za-z0-9-_]+)/([A-Za-z0-9-_]+)/([0-9]+)"
+    strain <- str_match(seq_name0, n)[,1]
+    
+    strain_dup <- which( duplicated(strain) == "TRUE")
+    
+    # get interset of duplicated name of seq to find the identical data
+    
+    tobedelect2 <- intersect(tobedelect2, strain_dup)
+    
+  }else{
+    
+    # for each replicated seqs, leave the oldest strain
+    
+    seq_vec <- sapply(seq0, 
+                      function(x){
+                        y = c2s(x)
+                        z = gsub("-", "", y)
+                        return(z)
+                      }
+    )
+    # extract year
+    y = "_([0-9]{4})-"
+    
+    tobedelect = c()
+    
+    for(k in 1: length(tobedelect2)){
+      
+      # find all duplicated seq  
+      dup0 <- which( match(seq_vec, seq_vec[tobedelect2[k]]) != "NA" )
+      
+      # old related seq      
+      dup_oldest <- dup0[ which.min(str_match(seq_name0[dup0], y)[,2]) ]
+      
+      # add to a new vector
+      tobedelect <- unique ( c(tobedelect, dup0[ which(!dup0 %in% dup_oldest == TRUE) ]) )
+      
+    }
+    
+    tobedelect2 <- tobedelect
+  } 
+  
   if ( ( length(tobedelect1) + length(tobedelect2) ) > 0){
     
     tobedelect <- sort( unique( c(tobedelect1, tobedelect2) ) )
-        ramain <- seq(1:length(seq0))[-tobedelect]
+    ramain <- seq(1:length(seq0))[-tobedelect]
     
     seq_name_out = seq_name0[ramain]
-         seq_out = seq0[ramain]
+    seq_out = seq0[ramain]
     
     # write fasta file
     
@@ -387,7 +427,7 @@ return(fastaInfo)
     
 print("DONE")
   }
-
+  
 }
 
 # To no redundant .fasta ####
