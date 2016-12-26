@@ -493,4 +493,80 @@ phylo_date <- function(x){
 }
 
 
+# convert YYYY-MM-DD to distributed table ####
+
+epi_tomonth <- function(start, end, date_v){
+  
+  # start and end most be YYYYMM and numeric format 
+  # date_V in "YYYY-MM-DD"
+  
+  library(stringr)
+  
+  # vector must be YYYY-MM-DD format
+  d = "([0-9]{4})-([0-9]{2})-([0-9]{2})"
+  mon = c("01", "02", "03", "04", "05", "06",
+          "07", "08", "09", "10", "11", "12")
+  
+  # month distribution as table
+  x = as.data.frame(
+    table(
+      as.numeric(
+        paste0(
+          str_match(date_v, d)[,2], str_match(date_v , d)[,3] 
+        ))))
+  
+  x[,1] = as.integer(as.character(x$Var1))
+  
+  # parse input date
+  start.y <- as.numeric(str_sub(as.character(start), 1, 4))
+  start.m <- as.numeric(str_sub(as.character(start), 5, 6))
+  
+  end.y <- as.numeric(str_sub(as.character(end), 1, 4))
+  end.m <- as.numeric(str_sub(as.character(end), 5, 6))
+  
+  diff.y <- end.y - start.y
+  
+  # y should be 
+  
+  if( diff.y == 0 ){
+    
+    y = as.integer( 
+      paste0(start.y, mon[seq(start.m, end.m)] 
+      ) )
+  }
+  
+  if( diff.y == 1 ){
+    
+    y = as.integer(c(paste0(start.y, mon[seq(start.m, 12)]), 
+                     paste0(end.y, mon[seq(1, end.m)]) 
+    ))
+  }
+  
+  if(diff.y > 1){
+    
+    l <- paste0(start.y, mon[seq(start.m, 12)])
+    o <- paste0(end.y, mon[seq(1, end.m)])
+    
+    m <- as.list(seq( start.y + 1, end.y -1))
+    n <- as.vector(sapply(m, 
+                          function(x){ 
+                            paste0(x, mon)
+                          }))
+    
+    y <- c(l, n, o)
+    
+  }
+  
+  # find out what's difference  
+  z <- setdiff(as.integer(y), x[,1])
+  z_df <- data.frame(z, rep(0, length(z)))
+  
+  colnames(z_df) = colnames(x)
+  
+  z_df <- rbind(x, z_df)
+  z_df <- z_df[order(z_df$Var1),]
+  colnames(z_df)[1] = "Month"
+  
+  return(z_df)
+}
 
