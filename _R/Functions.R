@@ -259,7 +259,7 @@ subtreseq2<-function(){
 
 # Turn tip names into number ######
 
-toNotip<-function(file){
+toNotip <- function(file){
   
   library(seqinr) 
   
@@ -466,6 +466,29 @@ tonoredundant <- function(){
               names = seq_name_out)         
   
   print(seq_name0[toberemoveid])    
+  
+}
+
+
+# convert YYYY-MM-DD to YY.datee ####
+
+phylo_date <- function(x){
+  
+  library(stringr)
+  
+  d = "([0-9]{4})-([0-9]{2})-([0-9]{2})"
+  
+  yr <- as.numeric(str_match(x, d)[,2])
+  mo <- as.numeric(str_match(x, d)[,3])
+  dy <- as.numeric(str_match(x, d)[,4])
+  
+  yr.0 <- paste0(yr, "-01-01")
+  daydifference <- as.numeric(difftime(strptime(x, format = "%Y-%m-%d"),
+                                       strptime(yr.0, format = "%Y-%m-%d"), 
+                                       units = "days"))/365
+  
+  yr.daydifference = yr + daydifference
+  return(yr.daydifference)
   
 }
 
