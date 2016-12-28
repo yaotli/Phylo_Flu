@@ -114,6 +114,7 @@ library(stringr)
      theme_bw() + 
      scale_x_continuous(breaks = c(seq(1, 96, by = 6)), 
                         labels = c()) + 
+     scale_y_continuous(breaks = c(seq(0,10, by = 2))) +
      xlab("") + 
      ylab("available Seq")
    
@@ -123,12 +124,163 @@ library(stringr)
    
 # locate TW strains on the tree ####
   
+# treedata_s3273_TW  
+# treedata_s3273_TWb  
+  
+  library(ggtree)
+  library(stringr)
+  
+  # ggtree(s3273_pooled_gbtw_fg_align)
+  # treedata_s3273_pooled_gbtw_fg = 6454 node; 3273 tip
+
+  treedata_s3273_pooled_gbtw_fg[,10] <- gsub("'", "",
+                                             treedata_s3273_pooled_gbtw_fg$label)
+  # _time
+  
+  d = "([0-9]{4})-([0-9]{2})-([0-9]{2})"
+  
+  treedata_s3273_pooled_gbtw_fg[,11] <- str_match(treedata_s3273_pooled_gbtw_fg$label, d)[,2]
+  treedata_s3273_pooled_gbtw_fg[,12] <- str_match(treedata_s3273_pooled_gbtw_fg$label, d)[,3]
+  treedata_s3273_pooled_gbtw_fg[,13] <- str_match(treedata_s3273_pooled_gbtw_fg$label, d)[,4]
+  
+  # _isolation place
+  
+  s = "A/([A-Za-z0-9-_]+)/"
+  treedata_s3273_pooled_gbtw_fg[,14] <- str_match(treedata_s3273_pooled_gbtw_fg$label, s)[,2]
+  
+  # deal with TW
+  # 150 ID contain "Tai"
+  
+  treedata_s3273_pooled_gbtw_fg[,15] <- rep(0, 
+                                            dim(treedata_s3273_pooled_gbtw_fg)[1])
+  
+  treedata_s3273_pooled_gbtw_fg[,15][ grep("Tai", treedata_s3273_pooled_gbtw_fg[,14])] <- 1
+  
+  
+  # eliminate seq with same info
+  # remaining = 128
+  
+  du = "/([0-9]{4})_([a-z])_([0-9{4}])"
+  
+  treedata_s3273_pooled_gbtw_fg[,16] <- rep(0, 
+                                            dim(treedata_s3273_pooled_gbtw_fg)[1])
+  
+  
+  treedata_s3273_pooled_gbtw_fg[, 16][ which(
+    treedata_s3273_pooled_gbtw_fg[, 15] == 1)[-grep(du, 
+                                                  treedata_s3273_pooled_gbtw_fg[, 10][which(
+                                                    treedata_s3273_pooled_gbtw_fg[,15] == 1) ])] 
+    ] <- 1
+  
+  treedata_s3273_pooled_gbtw_fg[,17] <- rep("grey", dim(treedata_s3273_pooled_gbtw_fg)[1])
+  treedata_s3273_pooled_gbtw_fg[,17][which(treedata_s3273_pooled_gbtw_fg[,16] == 1)] = "red"
+  
+  colnames(treedata_s3273_pooled_gbtw_fg)[10:17] <- c("ID", "Year", "Month", "Day", "Place", "TW", "TWb", "TWcolor")
+  
+  
+  # TW distribution 
+  # note: %<+%, color = I, alpha, geom_tippoint
+  c3<-ggtree(s3273_pooled_gbtw_fg_align) %<+% treedata_s3273_pooled_gbtw_fg + aes(color = I(TWcolor), alpha = 0.5) +
+    geom_tippoint()
+    
+  
+# Temporal distribution of global H3N2 ####
+  
+  
+  # create a continus temporal parameter: treedata_s3273_pooled_gbtw_fg$YYYYMM
+  
+  treedata_s3273_pooled_gbtw_fg[, 18] <- as.numeric(paste0(treedata_s3273_pooled_gbtw_fg$Year,
+                                             treedata_s3273_pooled_gbtw_fg$Month))
+  
+  colnames(treedata_s3273_pooled_gbtw_fg)[18] <- "YYYYMM"
+  
+  # arbitrarily set epi season as (Nov - Mar), inter-epi (May - Oct) 
+  episeason = c(seq(200610.1, 201610.1, by=100), seq(200704.1, 201604.1, by=100))
+  episeason = sort(episeason)
+  
+  treedata_s3273_pooled_gbtw_fg[, 19] <- 0
+  
+  # designate each seq to each interval
+  for (i in 1: 21){
+    
+    if (i == 1){
+      
+      x = treedata_s3273_pooled_gbtw_fg %>%
+        filter( YYYYMM < episeason[i] ) %>%
+        select(node)
+      
+      x <- unlist(x, use.names = FALSE)
+      treedata_s3273_pooled_gbtw_fg[, 19][x] = i
+      
+    }else{
+      
+      x = treedata_s3273_pooled_gbtw_fg %>%
+        filter( episeason[i-1] < YYYYMM & YYYYMM < episeason[i]) %>%
+        select(node)
+      
+      x <- unlist(x, use.names = FALSE)
+      treedata_s3273_pooled_gbtw_fg[, 19][x] = i
+      
+    }
+  }
+    
+  
+  treedata_s3273_pooled_gbtw_fg[, 19][which(treedata_s3273_pooled_gbtw_fg$Month == 99) ] = 0
+  
+  # now we have "period"
+  colnames(treedata_s3273_pooled_gbtw_fg)[19] <- "Period"
+  table(treedata_s3273_pooled_gbtw_fg$Period[1:3273])
+
+  # annual epidemic period on tree
+  
+  treedata_s3273_pooled_gbtw_fg[, 20] <- "#CCCCCC"
+  treedata_s3273_pooled_gbtw_fg[, 20][which( treedata_s3273_pooled_gbtw_fg$Period != 0)] <- 
+    rainbow(20)[ treedata_s3273_pooled_gbtw_fg$Period ]
+    
+  colnames(treedata_s3273_pooled_gbtw_fg)[20] <- "color_rb"
+  
+  
+  ggtree(s3273_pooled_gbtw_fg_align) %<+% 
+    treedata_s3273_pooled_gbtw_fg + aes(color = I(color_rb), alpha = 0.5 )
+  
+  # based on season and inter-epidemic
+  
+  treedata_s3273_pooled_gbtw_fg[, 21] <- "#CCCCCC"
+  treedata_s3273_pooled_gbtw_fg[, 21][which( treedata_s3273_pooled_gbtw_fg$Period != 0)] <- 
+    rep(c("orange", "blue"), 11)[ treedata_s3273_pooled_gbtw_fg$Period ]
+  
+  colnames(treedata_s3273_pooled_gbtw_fg)[21] <- "color_epi"
+  
+  c1<-ggtree(s3273_pooled_gbtw_fg_align) %<+% 
+    treedata_s3273_pooled_gbtw_fg + aes(color = I(color_epi), alpha = 0.5 )  
+  
+  # TW temporal distribution
+  
+  treedata_s3273_pooled_gbtw_fg[, 22] <- "#CCCCCC"
+  
+  treedata_s3273_pooled_gbtw_fg[, 22][which( treedata_s3273_pooled_gbtw_fg$TWb != 0)] <- 
+    treedata_s3273_pooled_gbtw_fg$color_epi[which( treedata_s3273_pooled_gbtw_fg$TWb != 0)]
+    
+  colnames(treedata_s3273_pooled_gbtw_fg)[22] <- "color_epi_TW"
+  
+  c2<-ggtree(s3273_pooled_gbtw_fg_align) %<+% 
+    treedata_s3273_pooled_gbtw_fg + aes(color = I(color_epi_TW), alpha = 0.5 ) +
+    geom_tippoint()
+  
+  multiplot(c1,c2, c3, ncol = 3)
+  
+  
+
+  
+  
+  
+    
+    
   
   
   
   
   
-  
-   
+ 
  
  
