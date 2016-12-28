@@ -244,6 +244,7 @@ library(stringr)
     treedata_s3273_pooled_gbtw_fg + aes(color = I(color_rb), alpha = 0.5 )
   
   # based on season and inter-epidemic
+  # orange = inter-epi; blue: epi
   
   treedata_s3273_pooled_gbtw_fg[, 21] <- "#CCCCCC"
   treedata_s3273_pooled_gbtw_fg[, 21][which( treedata_s3273_pooled_gbtw_fg$Period != 0)] <- 
@@ -316,7 +317,7 @@ library(stringr)
     
     xlab("") +
     scale_x_continuous(breaks = seq(2007, 2016, by = 1) ) + 
-    scale_color_discrete(name = "Period", labels=c("Inter-Epi", "Epi"))
+    scale_color_discrete(name = "Period", labels=c("Epi", "Inter-Epi"))
   
   
   
