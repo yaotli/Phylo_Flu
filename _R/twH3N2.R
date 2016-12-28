@@ -240,7 +240,7 @@ library(stringr)
   colnames(treedata_s3273_pooled_gbtw_fg)[20] <- "color_rb"
   
   
-  ggtree(s3273_pooled_gbtw_fg_align) %<+% 
+  c4 <-ggtree(s3273_pooled_gbtw_fg_align) %<+% 
     treedata_s3273_pooled_gbtw_fg + aes(color = I(color_rb), alpha = 0.5 )
   
   # based on season and inter-epidemic
@@ -267,17 +267,56 @@ library(stringr)
     treedata_s3273_pooled_gbtw_fg + aes(color = I(color_epi_TW), alpha = 0.5 ) +
     geom_tippoint()
   
-  multiplot(c1,c2, c3, ncol = 3)
+  multiplot(c4,c1,c2, c3, ncol = 4)
   
   
-
+# extract distance to root #####  
+  
+  # s3273_TW_id
+  # s3273_TW_time
   
   
+       s3273_TW_node <- treedata_s3273_pooled_gbtw_fg$node[
+         which(treedata_s3273_pooled_gbtw_fg$TWb == 1) ]
   
+       # to deal with month "99"  
+       x = treedata_s3273_pooled_gbtw_fg$Period[
+         which(treedata_s3273_pooled_gbtw_fg$TWb == 1) ] 
+       x[117] = 1
+       
+        s3273_TW_epi <- rep(c(1,0), 11)[x]
+  
+  s3273_TW_distoroot <- dist.nodes(s3273_pooled_gbtw_fg_align)[3274, s3273_TW_node]
+  
+  s3273_TW = data.frame(s3273_TW_id, s3273_TW_time, s3273_TW_epi, s3273_TW_distoroot)
+  colnames(s3273_TW) = c("ID", "Time", "Period", "DisToRoot")
+  
+  s3273_TW <- s3273_TW[-117,]
+  
+  
+  # plot: time against distance to root
+  ggplot(s3273_TW, aes(Time, DisToRoot, color = factor(Period)) ) + 
+    geom_point() + 
+    theme_bw() + 
     
+    geom_point(color = "black", size = 3.2, alpha = 0.8, shape = 1) + 
+    geom_point(size = 3, alpha = 0.8) + 
     
-  
-  
+    theme(
+      panel.border = element_rect(colour = "black", fill=NA, size=1),
+      axis.title = element_text(face="bold"),
+      axis.title.x = element_text(size = 20),
+      axis.title.y = element_text(size = 20),
+      axis.text.x = element_text(size = 15), 
+      axis.text.y = element_text(size = 15), 
+      
+      legend.text = element_text(size = 16),
+      legend.title = element_text(size = 20), 
+      legend.position="top") +
+    
+    xlab("") +
+    scale_x_continuous(breaks = seq(2007, 2016, by = 1) ) + 
+    scale_color_discrete(name = "Period", labels=c("Inter-Epi", "Epi"))
   
   
   
