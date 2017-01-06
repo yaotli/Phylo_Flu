@@ -119,7 +119,7 @@ library(stringr)
      ylab("available Seq")
    
   # combine 2 fig
-  multiplot(q, p, ncol =1) 
+  multiplot(q, p, s, ncol =1) 
    
    
 # locate TW strains on the tree ####
@@ -194,7 +194,7 @@ library(stringr)
   
   colnames(treedata_s3273_pooled_gbtw_fg)[18] <- "YYYYMM"
   
-  # arbitrarily set epi season as (Nov - Mar), inter-epi (May - Oct) 
+  # arbitrarily set epi season as (Nov - April)[0], inter-epi (May - Oct)[1] 
   episeason = c(seq(200610.1, 201610.1, by=100), seq(200704.1, 201604.1, by=100))
   episeason = sort(episeason)
   
@@ -264,9 +264,14 @@ library(stringr)
     
   colnames(treedata_s3273_pooled_gbtw_fg)[22] <- "color_epi_TW"
   
-  c2<-ggtree(s3273_pooled_gbtw_fg_align) %<+% 
+  treetipshape = c(rep(NA, 3273))
+  treetipshape[s3273_TW_node[-117]] = 16
+  
+  
+  c2<- ggtree(s3273_pooled_gbtw_fg_align) %<+% 
     treedata_s3273_pooled_gbtw_fg + aes(color = I(color_epi_TW), alpha = 0.5 ) +
     geom_tippoint()
+  
   
   multiplot(c4,c1,c2, c3, ncol = 4)
   
@@ -320,7 +325,50 @@ library(stringr)
     scale_color_discrete(name = "Period", labels=c("Epi", "Inter-Epi"))
   
   
+# extract 127 seq from the original file ####
   
+  library(seqinr) 
+  
+  # read-in: pooled_gbtw_fg_trim.fasta
+      fasta_s3273_tree <- read.fasta(file.choose())
+  fasta_seq_s3273_tree <- getSequence(fasta_s3273_tree)
+   fasta_ID_s3273_tree <- attributes(fasta_s3273_tree)$names
+    
+   fasta_noTW_s3273_tree <- sort(match(s3273_TW_id[-117], fasta_ID_s3273_tree))
+  
+  # which(treedata_s3273_TWb == 1) n = 128
  
- 
- 
+  write.fasta(fasta_seq_s3273_tree[fasta_noTW_s3273_tree], 
+              file.out = "s3273_TW.fasta", 
+              names = fasta_ID_s3273_tree[fasta_noTW_s3273_tree])
+  
+  
+# BEAST outcome ####
+  
+  s3273_tw_mcc <- read.beast(file.choose())
+  ggtree(s3273_tw_mcc, mrsd="2016-03-05") + theme_tree2()
+  
+  # s3273_TW
+  
+  treedata_s3273_TW_mcc = fortify(s3273_tw_mcc)
+  
+       t_color <- match(treedata_s3273_TW_mcc$label, s3273_TW$ID)[1:127]
+  t_color_tree <- c("blue","orange")[s3273_TW$Period[t_color]+1]
+  
+  g = ggtree(s3273_tw_mcc, mrsd="2016-03-05") + theme_tree2() + 
+    geom_tippoint(color = t_color_tree) 
+  
+  
+  # skyride
+  
+  skyridedata = read.csv(file.choose())
+
+  s = ggplot(skyridedata, aes(Time, Mean)) + geom_line() + theme_bw() + 
+    ylab("")
+  
+  multiplot(g, s, ncol=1)
+  
+  
+  
+  
+  
