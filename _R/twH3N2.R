@@ -180,12 +180,15 @@ library(stringr)
   
   # TW distribution 
   # note: %<+%, color = I, alpha, geom_tippoint
-  c3<-ggtree(s3273_pooled_gbtw_fg_align) %<+% treedata_s3273_pooled_gbtw_fg + aes(color = I(TWcolor), alpha = 0.5) +
-    geom_tippoint()
-    
+  
+  shapee = c(rep(NA, 3273))
+  shapee[s3273_TW_node[-117]] = 1
+  treetipshape = data.frame(node=c(1:3273), shapee)
+  
+  c3 <- ggtree(s3273_pooled_gbtw_fg_align) %<+% treedata_s3273_pooled_gbtw_fg + aes(color = I(TWcolor), alpha = 0.5)
+  t4 = c3 %<+% treetipshape + geom_tippoint(aes(shape = factor(shapee)))
   
 # Temporal distribution of global H3N2 ####
-  
   
   # create a continus temporal parameter: treedata_s3273_pooled_gbtw_fg$YYYYMM
   
@@ -201,6 +204,8 @@ library(stringr)
   treedata_s3273_pooled_gbtw_fg[, 19] <- 0
   
   # designate each seq to each interval
+  library(dplyr)
+  
   for (i in 1: 21){
     
     if (i == 1){
@@ -266,14 +271,14 @@ library(stringr)
   
   treetipshape = c(rep(NA, 3273))
   treetipshape[s3273_TW_node[-117]] = 16
+  treetipshape = data.frame(node=c(1:3273), treetipshape)
   
   
-  c2<- ggtree(s3273_pooled_gbtw_fg_align) %<+% 
-    treedata_s3273_pooled_gbtw_fg + aes(color = I(color_epi_TW), alpha = 0.5 ) +
-    geom_tippoint()
+  c2 <- ggtree(s3273_pooled_gbtw_fg_align) %<+% 
+    treedata_s3273_pooled_gbtw_fg + aes(color = I(color_epi_TW), alpha = 0.5 ) 
+  s2 = c2 %<+% treetipshape + geom_tippoint(aes(shape = factor(shapee)))
   
-  
-  multiplot(c4,c1,c2, c3, ncol = 4)
+  multiplot(c4,c1,s2, t4, ncol = 4)
   
   
 # extract distance to root #####  
@@ -356,9 +361,15 @@ library(stringr)
   t_color_tree <- c("blue","orange")[s3273_TW$Period[t_color]+1]
   
   g = ggtree(s3273_tw_mcc, mrsd="2016-03-05") + theme_tree2() + 
-    geom_tippoint(color = t_color_tree) 
-  
-  
+    geom_range(range='length_0.95_HPD', color='red', alpha=.4, size=0.5) +
+    geom_tippoint(color = t_color_tree) +
+    scale_x_continuous(breaks = seq(2007, 2016, by=1), 
+                       minor_breaks = seq(2007, 2016, by = 0.5)) +
+    theme_tree2(panel.grid.major.x = element_line(color = "black", size = 0.2),
+          panel.grid.minor.x = element_line(color = "grey", size = 0.1),
+          panel.grid.major.y = element_blank(),
+          panel.grid.minor.y = element_blank() )
+    
   # skyride
   
   skyridedata = read.csv(file.choose())
