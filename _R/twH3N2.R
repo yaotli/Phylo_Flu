@@ -101,7 +101,16 @@ library(stringr)
    theme_bw() + 
    scale_x_continuous(breaks = c(seq(1, 96, by = 6)), 
                       labels = llb) + 
-   xlab("") 
+   xlab("") +  
+     
+     theme(
+     panel.border = element_rect(colour = "black", fill=NA, size=1),
+     axis.title.y = element_text(size = 20),
+     axis.text.y = element_text(size = 15))
+   
+       
+     
+     
 
  # make sample distribution 
  # only 115 seqs during 20090101 - 20161230 are available
@@ -116,10 +125,15 @@ library(stringr)
                         labels = c()) + 
      scale_y_continuous(breaks = c(seq(0,10, by = 2))) +
      xlab("") + 
-     ylab("available Seq")
+     ylab("Seq") + 
+     
+     theme(
+       panel.border = element_rect(colour = "black", fill=NA, size=1),
+       axis.title.y = element_text(size = 20),
+       axis.text.y = element_text(size = 15))
    
   # combine 2 fig
-  multiplot(q, p, s, ncol =1) 
+  multiplot(q, p, ncol =1) 
    
    
 # locate TW strains on the tree ####
@@ -325,7 +339,7 @@ library(stringr)
       legend.title = element_text(size = 20), 
       legend.position="top") +
     
-    xlab("") +
+    xlab("") + ylab("Root-to-Tip Distance") +
     scale_x_continuous(breaks = seq(2007, 2016, by = 1) ) + 
     scale_color_discrete(name = "Period", labels=c("Epi", "Inter-Epi"))
   
@@ -373,12 +387,14 @@ library(stringr)
   # skyride
   
   skyridedata = read.csv(file.choose())
+  
+  g + geom_line(data = skyridedata, aes(x= Time, y=Median*10), 
+                color = "gray", size = 1.5, alpha = 0.6) +
+    
+    geom_ribbon(data = skyridedata, aes(x = Time, ymin = Lower*10, ymax = Upper*10),  
+                inherit.aes=FALSE, fill = "gray", alpha = 0.2) 
+  
 
-  s = ggplot(skyridedata, aes(Time, Mean)) + geom_line() + theme_bw() + 
-    ylab("")
-  
-  multiplot(g, s, ncol=1)
-  
   
   
   
