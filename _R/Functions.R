@@ -316,6 +316,7 @@ curateSeq <- function(maxamb, minseq, seqrep){
     
     seq_0 = c2s(seq0[[i]])
     seq_i = gsub("-", "", seq_0)
+    seq_i = gsub("~", "", seq_i)
     
     # seq length and number of ambiguous nucleotide
     
