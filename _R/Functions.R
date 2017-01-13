@@ -55,6 +55,10 @@ cleanID <- function(){
   seq_name = gsub("_-Month_and_day_unknown-", "-99-99", seq_name)
   seq_name = gsub("_-Day_unknown-", "-15", seq_name)
   
+  seq_name[which( endsWith(seq_name, "-") == "TRUE")] <- 
+    paste0(seq_name[which( endsWith(seq_name, "-") == "TRUE")], "15")
+  
+  
   # Time
   
   d = "([0-9]{4})-([0-9]{2})-([0-9]{2})"
