@@ -290,7 +290,7 @@ library(stringr)
   
   c2 <- ggtree(s3273_pooled_gbtw_fg_align) %<+% 
     treedata_s3273_pooled_gbtw_fg + aes(color = I(color_epi_TW), alpha = 0.5 ) 
-  s2 = c2 %<+% treetipshape + geom_tippoint(aes(shape = factor(shapee)))
+  s2 = c2 %<+% treetipshape + geom_tippoint(aes(shape = factor(shapee)), size = 3)
   
   multiplot(c4,c1,s2, t4, ncol = 4)
   
