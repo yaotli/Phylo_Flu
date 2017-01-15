@@ -225,7 +225,7 @@ pool_10653 <- curateSeq(5, 1500, 0)
     
     # tree
     p1 <- ggtree(sub_7225) %<+% treedata_sub7225 + aes(color = I(hit_color), alpha = 0.5)
-    p1 %<+% H5_tip + geom_tippoint(aes(shape = factor(shape)), size = 2)
+    p1 %<+% H5_tip + geom_tippoint(aes(shape = factor(shape)), size = 2.5)
     
     
     
