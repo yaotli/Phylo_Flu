@@ -161,30 +161,41 @@ source("helpers.R")
   
 ui <- fluidPage(
   
-  useShinyjs(),
-  tags$style(appCSS),
-
-  # textinput
-  textInput(inputId = "seq", 
-            label = "Example: Gs/GD/1/96_H5N1", 
-            value = "gatcagatttgcattggttaccatgcaaacaactcgacagagcaggttgacacaataatggaaaagaacgttactgttacacatgcccaagacatactggaaaagacacacaatgggaagctctgcgatctaaatggagtgaagcctctcattttgagagattgtagtgtagctggatggctcctcggaaaccctatgtgtgacgaattcatcaatgtgccggaatggtcttacatagtggagaaggccagtccagccaatgacctctgttacccaggggatttcaacgactatgaagaactgaaacacctattgagcagaacaaaccattttgagaaaattcagatcatccccaaaagttcttggtccaatcatgatgcctcatcaggggtgagctcagcatgtccataccatgggaggtcctcctttttcagaaatgtggtatggcttatcaaaaagaacagtgcatacccaacaataaagaggagctacaataataccaaccaagaagatcttttagtactgtgggggattcaccatcctaatgatgcggcagagcagacaaagctctatcaaaacccaaccacttacatttccgttggaacatcaacactgaaccagagattggttccagaaatagctactagacccaaagtaaacgggcaaagtggaagaatggagttcttctggacaattttaaagccgaatgatgccatcaatttcgagagtaatggaaatttcattgctccagaatatgcatacaaaattgtcaagaaaggggactcagcaattatgaaaagtgaattggaatatggtaactgcaacaccaagtgtcaaactccaatgggggcgataaactctagtatgccattccacaacatacaccccctcaccatcggggaatgccccaaatatgtgaaatcaaacagattagtccttgcgactggactcagaaatacccctggactatttggagctatagcaggttttatagagggaggatggcagggaatggtagatggttggtatgggtaccaccatagcaatgagcaggggagtggatacgctgcagacaaagaatccactcaaaaggcaatagatggagtcaccaataaggtcaactcgatcattgacaaaatgaacactcagtttgaggccgttggaagggaatttaataacttggaaaggaggatagagaatttaaacaagcagatggaagacggattcctagatgtctggacttataatgctgaacttctggttctcatggaaaatgagagaactctagactttcatgactcaaatgtcaagaacctttatgacaaggtccgactacagcttagggataatgcaaaggagctgggtaatggttgtttcgagttctatcacaaatgtgataatgaatgtatggaaagtgtaaaaaacggaacgtatgactacccgcagtattcagaagaagcaagactaaacagagaggaaataagtggagtaaaattggaatcaatgggaacttaccaaatactgtcaatttattcaacagtggcgagttccctagcactggcaatcatggtagct"),
+  titlePanel("H5 Tree"),
   
-  # button
-  
-  withBusyIndicatorUI(
-    actionButton(inputId = "click", 
-               label = "Enter")
-  ),
-  
-  # textoutput
-  tableOutput("blastinfo"),
-  
-  # plotoutput
-  plotOutput("tree")
-  
-  
+  sidebarLayout(
+    
+    sidebarPanel(
+      
+      useShinyjs(),
+      tags$style(appCSS),
+      
+      # textinput
+      textInput(inputId = "seq", 
+                label = "Example: Gs/GD/1/96_H5N1", 
+                value = "gatcagatttgcattggttaccatgcaaacaactcgacagagcaggttgacacaataatggaaaagaacgttactgttacacatgcccaagacatactggaaaagacacacaatgggaagctctgcgatctaaatggagtgaagcctctcattttgagagattgtagtgtagctggatggctcctcggaaaccctatgtgtgacgaattcatcaatgtgccggaatggtcttacatagtggagaaggccagtccagccaatgacctctgttacccaggggatttcaacgactatgaagaactgaaacacctattgagcagaacaaaccattttgagaaaattcagatcatccccaaaagttcttggtccaatcatgatgcctcatcaggggtgagctcagcatgtccataccatgggaggtcctcctttttcagaaatgtggtatggcttatcaaaaagaacagtgcatacccaacaataaagaggagctacaataataccaaccaagaagatcttttagtactgtgggggattcaccatcctaatgatgcggcagagcagacaaagctctatcaaaacccaaccacttacatttccgttggaacatcaacactgaaccagagattggttccagaaatagctactagacccaaagtaaacgggcaaagtggaagaatggagttcttctggacaattttaaagccgaatgatgccatcaatttcgagagtaatggaaatttcattgctccagaatatgcatacaaaattgtcaagaaaggggactcagcaattatgaaaagtgaattggaatatggtaactgcaacaccaagtgtcaaactccaatgggggcgataaactctagtatgccattccacaacatacaccccctcaccatcggggaatgccccaaatatgtgaaatcaaacagattagtccttgcgactggactcagaaatacccctggactatttggagctatagcaggttttatagagggaggatggcagggaatggtagatggttggtatgggtaccaccatagcaatgagcaggggagtggatacgctgcagacaaagaatccactcaaaaggcaatagatggagtcaccaataaggtcaactcgatcattgacaaaatgaacactcagtttgaggccgttggaagggaatttaataacttggaaaggaggatagagaatttaaacaagcagatggaagacggattcctagatgtctggacttataatgctgaacttctggttctcatggaaaatgagagaactctagactttcatgactcaaatgtcaagaacctttatgacaaggtccgactacagcttagggataatgcaaaggagctgggtaatggttgtttcgagttctatcacaaatgtgataatgaatgtatggaaagtgtaaaaaacggaacgtatgactacccgcagtattcagaagaagcaagactaaacagagaggaaataagtggagtaaaattggaatcaatgggaacttaccaaatactgtcaatttattcaacagtggcgagttccctagcactggcaatcatggtagct"),
+      # button
+      withBusyIndicatorUI(
+        actionButton(inputId = "click", 
+                     label = "Enter") ),
+      
+      # textoutput
+      tableOutput("blastinfo") 
+      
+    ),
+    
+    mainPanel(
+      
+      # plotoutput
+      plotOutput("tree")
+      
+    )
+    
   )
-
+)
+  
+  
+  
 
 
 # server ####
