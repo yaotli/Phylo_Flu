@@ -9,7 +9,7 @@
 2. It will take 1 - 3 mins to get the result
 
 
-### To be construct / solved
+### To be constructed / solved
 
 1. H5 nomenclature
 2. Problem in mislabeling
