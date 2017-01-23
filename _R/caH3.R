@@ -1,10 +1,11 @@
 library(seqinr)
 library(stringr)
 
+# HA ####
 # be care of ID from NCBI should remove space
 
 # remove _A_/
-# clean() and curateSeq() [n = 2944]
+# cleanID() and curateSeq() [n = 2944]
 
 # align, trim
 
@@ -144,7 +145,78 @@ library(ape)
 multiplot(an1, an2, an3, ncol = 3)
      
      
-     
+# NA ####
+
+N2_pool_7393 <- cleanID()
+
+# remove _A_/
+
+       file = read.fasta(file.choose())
+  seq_name0 = attributes(file)$names
+       seq0 = getSequence(file)
+   seq_name = sub("_A_/", "",seq_name0)
+
+   write.fasta(seq0, 
+               file.out = "~/Desktop/cleanID2.fasta", 
+               names = seq_name)
+
+# curateseq()   
+   
+   N2_pool_7393 <- curateSeq(5, 1300, 1)
+   
+   
+# read-in tree
+   
+   N2_sub3047 <- read.tree(file.choose())
+   ggtree(N2_sub3047)
+   
+         treedata_N2_sub3047 <- fortify(N2_sub3047)
+    treedata_N2_sub3047[,10] <- gsub("'", "",treedata_N2_sub3047$label)
+   
+  # colorring
+  
+  n_dog <- grep("canine", treedata_N2_sub3047[,10])
+  n_cat <- grep("feline", treedata_N2_sub3047[,10]) 
+  
+  n_dog = unique(c(n_dog, n_cat))
+  
+  n_swine <- grep("swine", treedata_N2_sub3047[,10])
+  n_Swine <- grep("Swine", treedata_N2_sub3047[,10])
+  
+  n_swine = unique(c(n_swine, n_Swine))
+  
+  treedata_N2_sub3047[11] <- "gray"
+  colnames(treedata_N2_sub3047)[11] = "colorr"
+  
+  test3 = tiplabel(type = 1, tdata = treedata_N2_sub3047, datacolumn = 11, n_dog, target = "red")
+  test3 = tiplabel(type = 1, tdata = test3, datacolumn = 11, n_swine, target = "orange")
+
+  an3 = ggtree(N2_sub3047) %<+% test3 + aes(color = I(colorr), alpha = 0.5)
+  
+  anm = c(n_dog, n_swine)
+  test3_canie <- data.frame(node = c(1:length(N2_sub3047$tip.label) ), shapee = NA) 
+  test3_canie <- tiplabel(type = 0, tdata = test3_canie, datacolumn = 2, anm, target = 16)
+
+  an4 = an3 %<+% test3_canie +  geom_tippoint(aes(shape = factor(shapee)), size = 2)
+  
+
+  # color time 
+  
+  n_2016 <- grep("2016", treedata_N2_sub3047[,10])
+  n_2015 <- grep("2015", treedata_N2_sub3047[,10])
+  
+  n_t1 <- unique(c(n_2016, n_2015))
+
+  test3[12] <- "gray"
+  colnames(test3)[12] = "colorrT"
+  
+  test3 = tiplabel(type = 1, tdata = test3, datacolumn = 12, n_t1, target = "red")
+  
+  an5 = ggtree(N2_sub3047) %<+% test3 + aes(color = I(colorrT), alpha = 0.5)
+  an6 = an5 %<+% test3_canie +  geom_tippoint(aes(shape = factor(shapee)), size = 2)
+  
+  
+
      
      
      
