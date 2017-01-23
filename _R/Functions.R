@@ -575,3 +575,42 @@ epi_tomonth <- function(start, end, date_v){
   return(z_df)
 }
 
+# tiplabel ####
+
+tiplabel <- function(type, 
+                     tdata, 
+                     datacolumn, 
+                     targetid, 
+                     target){
+  
+  # type: tip color
+  # must create a new column in treedata for tip color 
+  # ex: 
+  # treedata[, datacolumn] <- "black"
+  # colnames(treedata)[datacolumn] = "colorr"
+  
+  # type: tip shape
+  # must create a new dataframe
+  # treetipshape <- data.frame(node = c(1:tipnumber), shapee = NA)
+  
+  
+  if(type == 1){
+    
+    tdata[, datacolumn][targetid] <- target
+    
+    return(tdata)
+    
+  }else{
+    
+    tdata[, datacolumn] <- NA
+    tdata[, datacolumn][targetid] <- target
+    
+    return(tdata)
+    
+  }
+  
+  
+  
+}
+
+
