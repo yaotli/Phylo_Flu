@@ -575,41 +575,100 @@ epi_tomonth <- function(start, end, date_v){
   return(z_df)
 }
 
-# tiplabel ####
+# tip/branch label ####
 
-tiplabel <- function(type, 
-                     tdata, 
-                     datacolumn, 
+findtaxa <- function(type, 
+                     tree, 
                      targetid, 
                      target){
   
-  # type: tip color
-  # must create a new column in treedata for tip color 
-  # ex: 
-  # treedata[, datacolumn] <- "black"
-  # colnames(treedata)[datacolumn] = "colorr"
+  # type 1 = branch coloring 
+  # type 0 = tip shape
+  # default branch color = gray
   
-  # type: tip shape
-  # must create a new dataframe
-  # treetipshape <- data.frame(node = c(1:tipnumber), shapee = NA)
+  library(ape)
+  library(ggtree)
   
+  # extract tree data
+  tree.d <- fortify(tree)
+  tree.d[, ncol(tree.d) + 1] <- gsub("'", "", tree.d$label)
+  colnames(tree.d)[ncol(tree.d)] <- "taxaid"
   
-  if(type == 1){
+  # for tip shape
+  if (type == 0){
     
-    tdata[, datacolumn][targetid] <- target
+    shapetaxa <- data.frame(node = c(1:length(tree.d$isTip)), shapee = NA)
     
-    return(tdata)
+    for (i in 1: length(targetid)){
+      
+      shapetaxa$shapee[ grep(targetid[i], tree.d$taxaid) ] <- target[i]
+      
+    }
     
-  }else{
+    return(shapetaxa)
     
-    tdata[, datacolumn] <- NA
-    tdata[, datacolumn][targetid] <- target
+    # for branch colorring     
+  }else {
     
-    return(tdata)
+    # new column
+    
+    tree.d[, ncol(tree.d) + 1] <- "gray"
+    colnames(tree.d)[ncol(tree.d)] <- "colorr"
+    
+    # for branch extension
+    
+    edgematrix <- tree$edge
+    tobecolor = c()
+    pre_targetno = length(targetno)
+    post_targetno = 0
+    
+    for (i in 1: length(targetid)){
+      
+      targetno <- grep(targetid[i], tree.d$taxaid)
+      
+      # while loop 
+      
+      while( pre_targetno != post_targetno ){
+        
+        pre_targetno = length(targetno)
+        
+        for(k in 1:length(targetno)){
+          
+          # all sibiling 
+          sibs <- edgematrix[
+            which(edgematrix[,1] == 
+                    edgematrix[which(edgematrix[,2] == targetno[k]),][1]),][,2]
+          
+          if (length(sibs) == 1){
+            
+            targetno = c(targetno, edgematrix[which(edgematrix[,2] == targetno[k]),][1])
+            
+          }else{
+            
+            if (length(which(sibs %in% targetno == "FALSE")) == 0){
+              
+              tobecolor = c(edgematrix[which(edgematrix[,2] == targetno[k]),][1], tobecolor)
+              
+              targetno = c(targetno, edgematrix[which(edgematrix[,2] == targetno[k]),][1])
+            }
+            
+          }
+          targetno = unique(targetno)
+          tobecolor = unique(c(targetno, tobecolor))
+        }
+        
+        post_targetno = length(targetno)
+        
+      }
+      
+      # coloring
+      
+      tree.d$colorr[tobecolor] <- target[i]
+      
+    }
+    return(tree.d)    
     
   }
-  
-  
   
 }
 
