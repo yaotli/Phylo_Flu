@@ -63,7 +63,7 @@ library(ape)
      
      # color for canine + feline/ equine / swine [11]
      
-      n_dog <- grep("anine", treedata_sub1273[,10])
+      n_dog <- grep("canine", treedata_sub1273[,10])
       n_cat <- grep("feline", treedata_sub1273[,10]) 
       
       n_dog = unique(c(n_dog, n_cat))
@@ -83,7 +83,6 @@ library(ape)
     test = tiplabel(type = 1, tdata = test, datacolumn = 11, n_swine, target = "orange")
     
     an1 = ggtree(sub_1273) %<+% test + aes(color = I(colorr), alpha = 0.5)
-    
     
     # color for time [12]
      
@@ -216,7 +215,37 @@ N2_pool_7393 <- cleanID()
   an6 = an5 %<+% test3_canie +  geom_tippoint(aes(shape = factor(shapee)), size = 2)
   
   
-
+# Jan 30 re-plot ####
+  # sub_1273 & sub105
+  
+  host = c("canine", "feline", "equine", "swine", "Swine")
+  hoscol = c("red", "red", "green", "orange", "orange")
+  
+  findtaxa_sub1273 <- findtaxa(type = 1, tree = sub_1273, targetid = host, target = hoscol)
+  an1= ggtree(sub_1273) %<+% findtaxa_sub1273 + aes(color = I(colorr), alpha = 0.5)
+  
+  findtaxa_sub105 <- findtaxa(type = 1, tree = sub_105, targetid = host, target = hoscol)
+  an2= ggtree(sub_105) %<+% findtaxa_sub105 + aes(color = I(colorr), alpha = 0.5)
+  
+  time = c("2016", "2015", "2014", "2013", "2012", "2011", "2010", "2009", "2008", "2007", "2006")
+  tomecol = c(rep("red", 2), rep("green", 5), rep("blue", 4))
+  
+  findtaxa_sub105_t <- findtaxa(type = 1, tree = sub_105, targetid = time, target = tomecol)
+  an3= ggtree(sub_105) %<+% findtaxa_sub105_t + aes(color = I(colorr), alpha = 0.5)
+  
+  multiplot(an1, an2, an3, ncol = 3)   
+  
+  # NA tree: N2_sub3047
+  
+      findtaxa_sub3047 <- findtaxa(type = 1, tree = N2_sub3047, host, hoscol)
+  findtaxa_sub3047_tip <- findtaxa(type = 0, tree = N2_sub3047, host, rep(16, 6))
+    findtaxa_sub3047_t <- findtaxa(type = 1, tree = N2_sub3047, time, tomecol)
+  
+  an1 <- ggtree(N2_sub3047) %<+% findtaxa_sub3047 + aes(color = I(colorr), alpha = 0.5)
+  an1 %<+% findtaxa_sub3047_tip + geom_tippoint(aes(shape = factor(shapee)), size = 2)
+  
+  ggtree(N2_sub3047) %<+% findtaxa_sub3047_t + aes(color = I(colorr), alpha = 0.5)
+  
      
      
      
