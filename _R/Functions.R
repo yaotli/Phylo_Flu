@@ -605,7 +605,7 @@ findtaxa <- function(type,
       
     }
     
-    return(shapetaxa)
+return(shapetaxa)
     
     # for branch colorring     
   }else {
@@ -618,13 +618,27 @@ findtaxa <- function(type,
     # for branch extension
     
     edgematrix <- tree$edge
-    tobecolor = c()
-    pre_targetno = length(targetno)
-    post_targetno = 0
     
-    for (i in 1: length(targetid)){
+    # color grouping 
+    
+    group_color <- unique(target)
+    
+    for (i in 1: length(group_color)){
       
-      targetno <- grep(targetid[i], tree.d$taxaid)
+      # color as group to combine key word to targetno
+      
+      sub_color <- which(target == group_color[i])
+      targetno <- c()
+      
+      for (t in 1: length(sub_color)){
+        
+        targetno <- unique( c(targetno, grep( targetid[ sub_color[t] ], tree.d$taxaid)) )
+        
+      }
+      
+      tobecolor = c()
+      pre_targetno = length(targetno)
+      post_targetno = 0
       
       # while loop 
       
@@ -663,10 +677,10 @@ findtaxa <- function(type,
       
       # coloring
       
-      tree.d$colorr[tobecolor] <- target[i]
+      tree.d$colorr[tobecolor] <- group_color[i]
       
     }
-    return(tree.d)    
+return(tree.d)    
     
   }
   
