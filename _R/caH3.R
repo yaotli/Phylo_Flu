@@ -247,7 +247,26 @@ N2_pool_7393 <- cleanID()
   ggtree(N2_sub3047) %<+% findtaxa_sub3047_t + aes(color = I(colorr), alpha = 0.5)
   
      
-     
+# MCC tree ####
+  
+  # pick seqs
+  
+     fasta0 = read.fasta(file.choose())
+  seq.name0 = attributes(fasta0)$names
+       seq0 = getSequence(fasta0)
+       
+  tobedelete = grep("99-99", seq.name0)
+  
+  write.fasta(seq0[seq(1:length(seq0))[-tobedelete]], 
+              file.out = "~/Desktop/sub_71.fasta", 
+              names = seq.name0[seq(1:length(seq0))[-tobedelete]])
+  
+  
+  
+  
+  
+  
+  
      
      
      
