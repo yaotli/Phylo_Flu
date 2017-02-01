@@ -588,7 +588,7 @@ return(shapetaxa)
     
     # for branch extension
     
-    edgematrix <- tree$edge
+    edgematrix <- as.matrix(tree.d[,c(2,1)])
     
     # color grouping 
     
@@ -656,5 +656,4 @@ return(tree.d)
   }
   
 }
-
 
