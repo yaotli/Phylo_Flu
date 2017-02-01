@@ -263,9 +263,21 @@ N2_pool_7393 <- cleanID()
   
   
   
+ # tree
   
+      dog_mcc <- read.beast(file.choose())
+  dog_mcc_new <- read.tree(file.choose())
   
+  place = c("Wisconsin", "Texas", "Illinois", "Georgia", "North_Carolina", "Indiana", "Korea")
+  pcolor = c(rep("red", 6), "blue")
   
+  ggtree(dog_mcc, mrsd="2016-02-08") + theme_tree2()
+    
+  findtaxa_subdogh3 <- findtaxa(type = 1, tree = dog_mcc, targetid = place, target = pcolor)
+  m = fortify(dog_mcc)  
+
+  g = ggtree(dog_mcc, mrsd="2016-03-05") + theme_tree2() 
+  g %<+% findtaxa_subdogh3 + aes(color = I(colorr)) + geom_tiplab(size=1)
   
      
      
