@@ -89,7 +89,7 @@ cleanID <- function(){
       
       # create a null vector to appendex  
       
-       app = c("","a_", "b_", "c_", "d_", "e_", "f_", "g_", "h_", "i_", "j_")
+         app = paste0("_",letters)
       
        ap.id = seq_name[dup0]
       app.id = c()
@@ -725,7 +725,7 @@ cleanID_lt <- function(){
       
       # create a null vector to appendex  
       
-      app = c("","_a", "_b", "_c", "_d", "_e", "_f", "_g", "_h", "_i", "_j")
+      app = paste0("_",letters)
       
       ap.id = seq_name[dup0]
       app.id = c()
