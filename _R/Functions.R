@@ -856,7 +856,7 @@ curateSeq_lt <- function(maxamb, minseq, seqrep){
     
     labeled <- which( strain != "NA" )
     
-    tobedelect = c( unique(labeled, tobedelect2) )
+    tobedelect = unique( c(labeled, tobedelect2) )
     
     tobedelect2 <- tobedelect
   } 
