@@ -89,7 +89,7 @@ cleanID <- function(){
       
       # create a null vector to appendex  
       
-         app = paste0("_",letters)
+         app = c("", paste0("_",letters))
       
        ap.id = seq_name[dup0]
       app.id = c()
@@ -721,13 +721,13 @@ cleanID_lt <- function(){
     
     for (i in 1: length(duplicated_id)){
       
-      dup0 = which(match(seq_name, seq_name[duplicated_id[i]]) != "NA")
+        dup0 = which(match(seq_name, seq_name[duplicated_id[i]]) != "NA")
       
       # create a null vector to appendex  
       
-      app = paste0("_",letters)
+         app = c("", paste0("_",letters))
       
-      ap.id = seq_name[dup0]
+       ap.id = seq_name[dup0]
       app.id = c()
       
       # loop to deal with multiple replicated
