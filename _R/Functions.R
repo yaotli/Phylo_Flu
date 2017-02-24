@@ -735,7 +735,7 @@ cleanID_lt <- function(){
       
       for (k in 1: length(ap.id)){
         
-        app.id[k] = paste0(app.id[k], app[k])
+        app.id[k] = paste0(ap.id[k], app[k])
       }
       
       # back to seq_name0  
