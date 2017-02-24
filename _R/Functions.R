@@ -851,7 +851,7 @@ curateSeq_lt <- function(maxamb, minseq, seqrep){
     
     # find labeled & duplicated
     
-    y <-  "_([A-Z0-9]{4})_([a-z])"
+    y <-  "_([A-Z0-9]{4})_([a-zA-Z]{1})"
     strain <- str_match(seq_name0, y)[,1]
     
     labeled <- which( strain != "NA" )
