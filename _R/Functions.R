@@ -21,63 +21,74 @@ getDescendants<-function(tree,node,curr=NULL){
 # should follow strict ID arrangement before download .fasta file
 # require package seqinr and stringr
 # deal with duplicated, problematic string and extract info
-# fill the date info with either -15 or -99-99
 
-
-cleanID <- function(){
+cleanID <- function(x){
+  
+  # require Function::phylo_date   
   
   library(seqinr)
   library(stringr)
   
-  file = read.fasta(file.choose())
+  # read-in
+  
+  file <- read.fasta(file.choose())
   
   seq_name0 = attributes(file)$names
-       seq0 = getSequence(file)
+  seq0 = getSequence(file)
   
-  
-  # Deal with problematic string
+  # deal with ineligible id
   
   seq_name = gsub(" ", "_", seq_name0)
-  
   seq_name = gsub("\\(", "-", seq_name)
   seq_name = gsub("\\)", "-", seq_name)
   seq_name = gsub("\\[", "-", seq_name)
   seq_name = gsub("\\]", "-", seq_name)
-  
   seq_name = gsub("\\'", "", seq_name)
-  seq_name = gsub(">", "", seq_name)  
   seq_name = gsub("\\.", "-", seq_name)  
   
+  seq_name = gsub(">", "", seq_name)  
   
-  # Dissect the string 
-  # for GISAID
+  # for gisaid
+  seq_name = gsub("_A_/", "", seq_name)
   
-  seq_name = gsub("_-Month_and_day_unknown-", "-99-99", seq_name)
+  # deal with date
+  
+  # for gisaid
+  seq_name = gsub("_-Month_and_day_unknown-", "-07-01", seq_name)
   seq_name = gsub("_-Day_unknown-", "-15", seq_name)
   
-  seq_name[which( endsWith(seq_name, "-") == "TRUE")] <- 
-    paste0(seq_name[which( endsWith(seq_name, "-") == "TRUE")], "15")
+  # for ncbi
   
+  # w/o all
+  seq_name[which( endsWith(seq_name, "_--") == "TRUE")] <- 
+    gsub("_--", "_9999-99-99", seq_name[which( endsWith(seq_name, "_--") == "TRUE")])
   
-  # Time
+  # w/o month and day
+  seq_name[which( endsWith(seq_name, "--") == "TRUE")] <- 
+    gsub("--", "-07-01", seq_name[which( endsWith(seq_name, "--") == "TRUE")])
+  
+  # w/o day
+  sub_seq <- which( endsWith(seq_name, "-") == "TRUE" )
+  
+  seq_name[sub_seq] <- paste0(seq_name[sub_seq], "15")
+  
+  # generate temporal info
   
   d = "([0-9]{4})-([0-9]{2})-([0-9]{2})"
   
-  time_raw <- str_match(seq_name, d)[,1]
+  for (i in 1: ( length(seq0)) ) {
+    
+    seq_name[i] <- gsub(x = seq_name[i], pattern = d, replacement = 
+                          
+                          phylo_date( str_match(string = seq_name[i], pattern = d)[,1] ) )
+    
+  }
   
-  # Site of isolate
+  # deal with duplicated ID  
   
-  s = "A/([A-Za-z0-9-_]+)/"
+  duplicated_id = which(duplicated(seq_name) == "TRUE")
   
-  site <- str_match(seq_name, s)[,2]
-  
-  
-  # Deal with replicated
-  
-    duplicated_id = which(duplicated(seq_name) == "TRUE")
-  duplicated_note = duplicated(seq_name)
-  
-  # loop for each replicated case
+  # loop for adding pseudocode
   
   if( length(duplicated_id) > 0 ){
     
@@ -85,60 +96,58 @@ cleanID <- function(){
     
     for (i in 1: length(duplicated_id)){
       
-      dup0 = which(match(seq_name, seq_name[duplicated_id[i]]) != "NA")
+      dup0 = which( match(seq_name, seq_name[duplicated_id[i]] ) != "NA" )
       
       # create a null vector to appendex  
       
-         app = c("", paste0("_",letters), toupper(paste0("_",letters)))
+      app = c("", paste0(letters, "_"), toupper(paste0(letters, "_") ) )
       
-       ap.id = seq_name[dup0]
+      ap.id = seq_name[dup0]
       app.id = c()
       
       # loop to deal with multiple replicated
       # find the date info, insert labeling in the middle
+      
+      d = "([0-9]{4})\\.([0-9]{2})"
       
       time_rep <- str_match(ap.id, d)[,1]
       
       for (k in 1: length(ap.id)){
         
         app.id[k] = sub(time_rep[k], paste0(app[k], time_rep[k]), ap.id[k])
+        
       }
       
-      # back to seq_name0  
+      # back to seq_name
       
       seq_name[dup0] = app.id
       
     }
+    
   }     
+  
   
   duplicated_id_ed = which(duplicated(seq_name) == "TRUE")
   
-  
   if (length(duplicated_id_ed) > 0 ){
     
-print("ERROR") 
+    print("ERROR") 
     
   }else{
-    
-    # write fasta file
     
     write.fasta(seq0, 
                 file.out = "~/Desktop/cleanID.fasta", 
                 names = seq_name)
     
-    # dataframe output
-    
-    identicalID = as.character(duplicated_note)
-    
-    fastaInfo <- data.frame(no = seq(1:length(seq_name)),seq_name, site, time_raw, identicalID)
-    
-    
-return(fastaInfo)
-print("DONE")
+    print("DONE")
     
   }
   
+  
 }
+
+
+
 
 # Subtree seq extraction #####
 
@@ -261,23 +270,32 @@ toNotip <- function(file){
 
 
 # Curate the seq ####
-# seqrep = 0 remove identical seq
-# seqrep = 1 remove all seq with the same nt. info
 
-curateSeq <- function(maxamb, minseq, seqrep){
+
+curateSeq <- function(maxamb = 5, minseq = 1600, mode = 1, vip = 0){
+  
+  # should apply after cleanID
+  # mode 1 : curation; 2 : duplicated seq; 3 : duplicated id; 4 : similar id
+  #      5 : 1x2x3 ;   6 : 1x2x4
+  #      7 : 1+2+3 ;   8 : 1+2+4    
+  
+  
   
   library(seqinr)
   library(stringr)
   
+  # read-in
+  
   file = read.fasta(file.choose())
   
   seq_name0 = attributes(file)$names
-       seq0 = getSequence(file)
+  seq0 = getSequence(file)
   
-  # null vector for seq to-be-delect  
+  # sequence curation [1]
   
-  tobedelect1 = c()
-  tobedelect2 = c()
+  # for ambiguous nucleotide and seq length
+  
+  tobedelect1 <- c()
   
   for(i in 1: length(seq0)){
     
@@ -285,14 +303,14 @@ curateSeq <- function(maxamb, minseq, seqrep){
     
     # convert character to string
     
-    seq_0 = c2s(seq0[[i]])
+    seq_0 = c2s( seq0[[i]] )
     seq_i = gsub("-", "", seq_0)
     seq_i = gsub("~", "", seq_i)
     
     # seq length and number of ambiguous nucleotide
     
     seqlth = length( s2c(seq_i) )
-       amb = length( which(! s2c(seq_i) %in% ATCG ) )
+    amb = length( which(! s2c(seq_i) %in% ATCG ) )
     
     if( ( seqlth < minseq ) | ( amb > maxamb ) ){
       
@@ -302,109 +320,76 @@ curateSeq <- function(maxamb, minseq, seqrep){
     
   }
   
-print(length(tobedelect1))
+  print( paste0("curate: ", length(tobedelect1) ) )
   
-  # Deal with seq duplication - tobedelect2
+  # duplicated sequcnes [2]
   
-  dup = duplicated(sapply(seq0, 
-                          function(x){
-                            
-                            y = c2s(x)
-                            z = gsub("-", "", y)
-                            return(z)
-                          }
-  ))
-  
-  tobedelect2 <- which(dup == "TRUE")
-  
-print(length(tobedelect2))
-  
-  # find out identical seq
-  
-  if (seqrep == 0){
+  dup_seq <-  which(
     
-    # Strain name
-    
-    n <- "A/([A-Za-z0-9-_]+)/([A-Za-z0-9-_]+)/([0-9]+)"
-    strain <- str_match(seq_name0, n)[,1]
-    
-    strain_dup <- which( duplicated(strain) == "TRUE")
-    
-    # get interset of duplicated name of seq to find the identical data
-    
-    tobedelect2 <- intersect(tobedelect2, strain_dup)
-    
-  }else{
-    
-    # for each replicated seqs, leave the oldest strain
-    
-    seq_vec <- sapply(seq0, 
-                      function(x){
-                        y = c2s(x)
-                        z = gsub("-", "", y)
-                        return(z)
-                      }
-    )
-    # extract year
-    y = "_([0-9]{4})-"
-    
-    tobedelect = c()
-    
-    for(k in 1: length(tobedelect2)){
+    duplicated( sapply(seq0, function(x){
       
-      # find all duplicated seq  
-      dup0 <- which( match(seq_vec, seq_vec[tobedelect2[k]]) != "NA" )
+      y = c2s(x)
+      z = gsub("-", "", y)
       
-      # old related seq      
-      dup_oldest <- dup0[ which.min(str_match(seq_name0[dup0], y)[,2]) ]
-      
-      # add to a new vector
-      tobedelect <- unique ( c(tobedelect, dup0[ which(!dup0 %in% dup_oldest == TRUE) ]) )
-      
-    }
-    
-    tobedelect2 <- tobedelect
-  } 
+      return(z) 
+    }  
+    )) == "TRUE")
   
-  if ( ( length(tobedelect1) + length(tobedelect2) ) > 0){
-    
-    tobedelect <- sort( unique( c(tobedelect1, tobedelect2) ) )
-    ramain <- seq(1:length(seq0))[-tobedelect]
-    
-    seq_name_out = seq_name0[ramain]
-    seq_out = seq0[ramain]
-    
-    # write fasta file
-    
-write.fasta(seq_out, 
-            file.out = "~/Desktop/curateSeq.fasta", 
-            names = seq_name_out)           
-    
-    # extract fastaInfo
-    # Time
-    
-    d = "([0-9]{4})-([0-9]{2})-([0-9]{2})"
-    
-    time_raw <- str_match(seq_name_out, d)[,1]
-    
-    # Site of isolate
-    
-    s = "A/([A-Za-z0-9-_]+)/"
-    
-    site <- str_match(seq_name_out, s)[,2]       
-    
-    fastaInfo <- data.frame(no = seq(1:length(seq_name_out)), seq_name_out, site, time_raw)
-    
-print("DONE")  
-return(fastaInfo)
-    
-    
-  }else{
-    
-print("DONE")
-  }
+  print( paste0("dupSeq: ", length(dup_seq) ) )
+  
+  # duplicated id (after cleanID) [3]
+  
+  du = "_([HN0-9]+)_([a-zA-z])_"
+  dup_id <- grep(du, seq_name0)
+  
+  print( paste0("dupID: ", length(dup_id) ) )
+  
+  # similar id [4]
+  
+  m = "a/([A-Za-z0-9-_]+)/([A-Za-z0-9-_]+)/([A-Za-z0-9-_]+)"
+  
+  sim_id <- which( duplicated(str_match( tolower(seq_name0), m)[,1]) == TRUE)
+  
+  print( paste0("simID: ", length(sim_id) ) )
+  
+  # mode 
+  
+  mode1x2 <- sort( unique( c(tobedelect1, dup_seq) ) )
+  mode1x3 <- sort( unique( c(tobedelect1, dup_id ) ) )
+  mode1x4 <- sort( unique( c(tobedelect1, sim_id ) ) )
+  
+  mode1x2x3 <- sort( unique( c(tobedelect1, intersect(dup_seq, dup_id)) ) )
+  mode1x2x4 <- sort( unique( c(tobedelect1, intersect(dup_seq, sim_id)) ) )
+  
+  mode1p2p3 <- sort( unique( c(tobedelect1, dup_seq, dup_id ) ) )
+  mode1p2p4 <- sort( unique( c(tobedelect1, dup_seq, sim_id ) ) )
+  
+  
+  tobedelect_f <- list(tobedelect1, mode1x2, mode1x3, mode1x4, 
+                       mode1x2x3, mode1x2x4, 
+                       mode1p2p3, mode1p2p4)
+  
+  remain <- seq(1: length(seq0))[- tobedelect_f[[mode]] ]
+  
+  # special list
+  
+  remain <- sort( unique( c( remain, rev(seq(1: length(seq0) ))[1:vip] ) ) )
+  
+  seq_name_out <- seq_name0[remain]
+  seq_out <- seq0[remain]
+  
+  write.fasta(seq_out,
+              file.out = paste0("~/Desktop/curateSeq", "-", mode, ".fasta"), 
+              names = seq_name_out)
+  
+  print( paste0("delete: ", ( length(seq0) - length(remain) ) ) )
+  print( paste0("remain: ", length(remain) ) )
+  
   
 }
+
+
+
 
 # To no redundant .fasta ####
 
@@ -463,7 +448,20 @@ phylo_date <- function(x){
                                        strptime(yr.0, format = "%Y-%m-%d"), 
                                        units = "days"))/365
   
+  # bug?
+  if ( is.na(daydifference) ){ 
+    
+    x <- sub(pattern = "01", replacement = "02", x)
+    daydifference <- as.numeric(difftime(strptime(x, format = "%Y-%m-%d"),
+                                         strptime(yr.0, format = "%Y-%m-%d"), 
+                                         units = "days"))/365
+    
+    
+  } 
+  
   yr.daydifference = yr + daydifference
+  yr.daydifference <- format( round(yr.daydifference, 2), nsmall = 2)
+  
   return(yr.daydifference)
   
 }
@@ -882,5 +880,35 @@ curateSeq_lt <- function(maxamb, minseq, seqrep){
     
     print("DONE")
   }
+  
+}
+
+
+
+# random sequence ####
+
+rSeq <- function(n = 10, seed = 999){
+  
+  library(seqinr)
+  library(stringr)
+  
+  
+  file = read.fasta(file.choose())
+  
+  seq_name0 = attributes(file)$names
+  seq0 = getSequence(file)
+  
+  set.seed(seed)     
+  y = sample(1: length(seq0), n)  
+  y = sort( unique(y) )
+  
+  out_seq = seq0[y]
+  out_seq_name = seq_name0[y]
+  
+  write.fasta(out_seq, 
+              file.out = "~/Desktop/rSeq.fasta", 
+              names = out_seq_name)
+  
+  print("DONE") 
   
 }
