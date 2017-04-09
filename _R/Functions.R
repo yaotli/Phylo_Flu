@@ -112,6 +112,9 @@ cleanID <- function(x){
       
       time_rep <- str_match(ap.id, d)[,1]
       
+      # deal with no time info
+      if (  is.na(time_rep)[1] == TRUE ){ time_rep = rep("NA", length(dup0)) }
+      
       for (k in 1: length(ap.id)){
         
         app.id[k] = sub(time_rep[k], paste0(app[k], time_rep[k]), ap.id[k])
