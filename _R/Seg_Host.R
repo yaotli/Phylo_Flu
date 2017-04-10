@@ -53,7 +53,7 @@ file <- read.fasta(file.choose())
 
 
     humannote <- "_\\{Human\\}"
-  speciesnode <- "_\\{[A-Za-z0-9]+\\}"
+  speciesnode <- "_\\{[A-Za-z0-9_-]+\\}"
   
   hu <- grep(humannote, seq_name0)
   
