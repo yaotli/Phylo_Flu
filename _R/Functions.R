@@ -163,7 +163,7 @@ subtreseq<-function(){
   seq.name0 = attributes(fasta0)$names
   seq0 = getSequence(fasta0)
   
-  sub.tree = read.csv(file.choose(), header = FALSE, stringsAsFactors = FALSE)
+  sub.tree = read.table(file.choose(), header = FALSE, stringsAsFactors = FALSE)
   id.subtree = match(sub.tree[,1], seq.name0)
   
   if( any(NA %in% id.subtree) == "TRUE"){
@@ -175,12 +175,16 @@ subtreseq<-function(){
     seq.name0_subtree = seq.name0[id.subtree]
     seq0_subtree = seq0[id.subtree]
     
-    write.fasta(seq0_subtree, file.out = "~/Desktop/subtree.fasta", names = seq.name0_subtree)
+    write.fasta(seq0_subtree, 
+                file.out = "~/Desktop/subtree.fasta", 
+                names = seq.name0_subtree )
     
     print("Done")
     
   } }
 
+# NOTE:
+# unedited:
 subtreseq2<-function(){
   
   library(seqinr) 
