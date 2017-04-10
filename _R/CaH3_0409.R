@@ -123,6 +123,28 @@ file <- read.fasta(file.choose())
   
   # source: curateSeq-2_trim_h3_ha_an.fasta
   
+# extract subtree ####
+  
+  # soruce: sub120 from sub120.tre / cleanID_h3_ha_an.fasta
+  
+  subtreseq()
+  
+# align, trim, FastTree and Raxml
+  
+  # in .phylip file, "~" should be replaced with "-"
+  # ./raxml_AVX2 -s trim -n tree -m GTRGAMMA -x 100 -# autoMRE -f a -p 99 >log
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
   
   
   
