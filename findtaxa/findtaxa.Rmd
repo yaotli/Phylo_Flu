@@ -212,6 +212,7 @@ tiptree
 The Warning message from one tip name with "bird".
 
 
+
 ### color the *branch*
 
 Prepare the same stuffs as previously: 2 vectors for **keyword** and **color**; **findtaxa** (this time `type = 1`) and `%<+%` (but with `aes()`, not `geom_tippoint()`.
@@ -232,7 +233,6 @@ dataforannotate <- findtaxa(type = 1,
 
 
 ```
-
 
 ```{r}
 
