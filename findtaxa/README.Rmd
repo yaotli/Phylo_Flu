@@ -210,6 +210,9 @@ tiptree
 
 ```
 
+> Host species (Dog: red, Cat: orange; duck: green)
+
+
 The Warning message from one tip name with "bird".
 
 
@@ -247,6 +250,9 @@ branchtree <- tree0 %<+% dataforannotate + aes(color = I(colorr)) +
 branchtree
 
 ```
+
+> Geo (USA: red; Korea: blue)
+
 
 ## Notes
 

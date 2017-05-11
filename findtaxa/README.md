@@ -186,6 +186,8 @@ tiptree
 
 ![](README_files/figure-markdown_github/unnamed-chunk-9-1.png)
 
+> Host species (Dog: red, Cat: orange; duck: green)
+
 The Warning message from one tip name with "bird".
 
 ### color the *branch*
@@ -214,6 +216,8 @@ branchtree
 ```
 
 ![](README_files/figure-markdown_github/unnamed-chunk-13-1.png)
+
+> Geo (USA: red; Korea: blue)
 
 Notes
 -----
