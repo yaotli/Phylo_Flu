@@ -248,7 +248,9 @@ branchtree
 
 ```
 
+## Notes
 
+*colorr* and *shapee* are meaningless column names for the dataforannotate. 
 
 
 

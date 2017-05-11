@@ -148,7 +148,7 @@ treefile <- read.tree("./H3")
 tree0
 ```
 
-![](findtaxa_files/figure-markdown_github/unnamed-chunk-5-1.png)
+![](README_files/figure-markdown_github/unnamed-chunk-5-1.png)
 
 Create accessory data
 ---------------------
@@ -184,7 +184,7 @@ tiptree
 
     ## Warning: Removed 1 rows containing missing values (geom_point_g_gtree).
 
-![](findtaxa_files/figure-markdown_github/unnamed-chunk-9-1.png)
+![](README_files/figure-markdown_github/unnamed-chunk-9-1.png)
 
 The Warning message from one tip name with "bird".
 
@@ -213,4 +213,9 @@ branchtree <- tree0 %<+% dataforannotate + aes(color = I(colorr)) +
 branchtree
 ```
 
-![](findtaxa_files/figure-markdown_github/unnamed-chunk-13-1.png)
+![](README_files/figure-markdown_github/unnamed-chunk-13-1.png)
+
+Notes
+-----
+
+*colorr* and *shapee* are meaningless column names for the dataforannotate.
