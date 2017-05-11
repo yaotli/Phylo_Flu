@@ -1,0 +1,11 @@
+name: h5_nomenclature
+title: H5 nomenclature
+account: yaotli
+server: shinyapps.io
+appId: 151170
+bundleId: 680121
+url: https://yaotli.shinyapps.io/h5_nomenclature/
+when: 1484499462.0193
+asMultiple: FALSE
+asStatic: FALSE
+ignoredFiles: treedata.R
