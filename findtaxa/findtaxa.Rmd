@@ -1,11 +1,12 @@
 ---
 title: "findtaxa"
-output: github_document
+output: html_document
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
+
 
 This is a function based on `ggtree` to edit the phylogenetic tree.
 
@@ -246,6 +247,8 @@ branchtree <- tree0 %<+% dataforannotate + aes(color = I(colorr)) +
 branchtree
 
 ```
+
+
 
 
 
