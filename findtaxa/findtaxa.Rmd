@@ -9,7 +9,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 This is a function based on `ggtree` to edit the phylogenetic tree.
 
-### Example file
+## Example file
 
 A `Newick` format tree with tip names generally with host and subtype information. For other tree formats: [Tree Data Import](https://bioconductor.org/packages/devel/bioc/vignettes/ggtree/inst/doc/treeImport.html).
 
@@ -24,7 +24,7 @@ A `Newick` format tree with tip names generally with host and subtype informatio
 
 
 
-### Function
+## Function
 
 
 ```{r}
@@ -142,7 +142,7 @@ findtaxa <- function(type,
 ```
 
 
-### Imput tree file and build the tree
+## Imput tree file and build the tree
 
 We need three R packages: `stringr`, `ggtree`, `ape`.
 
@@ -169,9 +169,9 @@ tree0
 
 ```
 
-### Create accessory data 
+## Create accessory data 
 
-#### color the *tip* only
+### color the *tip* only
 
 Prepare 2 vectors containing the keywords in tip names and corresponding colors.
 
@@ -212,7 +212,7 @@ tiptree
 The Warning message from one tip name with "bird".
 
 
-#### color the *branch*
+### color the *branch*
 
 Prepare the same stuffs as previously: 2 vectors for **keyword** and **color**; **findtaxa** (this time `type = 1`) and `%<+%` (but with `aes()`, not `geom_tippoint()`.
 
