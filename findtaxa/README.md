@@ -15,6 +15,8 @@ A `Newick` format tree with tip names generally with host and subtype informatio
 Function
 --------
 
+Direct copy and run in R or soucre("file\_with\_function.R").
+
 ``` r
 findtaxa <- function(type, 
                      tree, 
