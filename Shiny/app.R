@@ -148,7 +148,7 @@ source("helpers.R")
 
 # read tree file
 
-            subTreefile <- read.tree("www/sub_7225")
+            subTreefile <- read.tree("www/sub_7225.txt")
        treedata_subTree <- fortify(subTreefile)
   treedata_subTree[,10] <- gsub("'", "", treedata_subTree$label)
   treedata_subTree[,11] <- "grey"

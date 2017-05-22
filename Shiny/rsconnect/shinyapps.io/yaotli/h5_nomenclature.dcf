@@ -3,9 +3,9 @@ title: H5 nomenclature
 account: yaotli
 server: shinyapps.io
 appId: 151170
-bundleId: 680121
+bundleId: 836424
 url: https://yaotli.shinyapps.io/h5_nomenclature/
-when: 1484499462.0193
+when: 1495472827.80539
 asMultiple: FALSE
 asStatic: FALSE
 ignoredFiles: treedata.R
