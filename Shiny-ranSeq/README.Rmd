@@ -1,0 +1,4 @@
+# A small app for sequence extraction from fas and nexus
+
+
+#### [link](https://yaotli.shinyapps.io/ranSeq/)
