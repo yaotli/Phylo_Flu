@@ -5,8 +5,8 @@ account: yaotli
 server: shinyapps.io
 hostUrl: https://api.shinyapps.io/v1
 appId: 225339
-bundleId: 1027377
+bundleId: 1027561
 url: https://yaotli.shinyapps.io/ranSeq/
-when: 1508064344.29913
+when: 1508077153.01962
 asMultiple: FALSE
 asStatic: FALSE

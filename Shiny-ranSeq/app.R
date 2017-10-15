@@ -121,7 +121,11 @@ ui <-
                         
                         ),
               
-              tabPanel( "Readme") )
+              tabPanel( "Readme"), 
+              fluidRow( 
+                column(6, hr(),
+                       h5("More note and codes are on GitHub page") ))
+              )
 
 ### server --------------------------------
 
