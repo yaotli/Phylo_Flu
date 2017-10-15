@@ -1,4 +1,14 @@
-# A small app for sequence extraction from fas and nexus
+### A small tool for sequence extraction
+***
+
+> v20171015
 
 
+#### Note:
+
+1. Including blank or marks other than "-" or "_" in sequence names would inference readin
+2. This app will never collected your sequence data
+3. ...
+
+***
 #### [link](https://yaotli.shinyapps.io/ranSeq/)
