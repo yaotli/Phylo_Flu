@@ -129,9 +129,10 @@ ui <-
 
 ### server --------------------------------
 
-server  <- function( input, output )
+server  <- function( input, output, session)
 {
-  options(shiny.maxRequestSize=50*1024^2)
+  session$allowReconnect(TRUE)
+  options(shiny.maxRequestSize=100*1024^2)
   # table
   inputvalues <- reactive(
     {
@@ -176,6 +177,7 @@ server  <- function( input, output )
                         {
                           
                           fasfile <- read.fasta( input$input_fas$datapath )
+                          trefile <- read.nexus( input$input_tre$datapath )
                           
                           temp = 
                             selectseq( 
@@ -185,7 +187,7 @@ server  <- function( input, output )
                               min.lth = as.numeric(input$min.lth),
                               max.amb = as.numeric(input$max.amb),
                               seed    = as.numeric(input$seed),
-                              type    = "s",
+                              type    = input$type,
                               key     = as.character(input$key) )
                           
                           return( temp )

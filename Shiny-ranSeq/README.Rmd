@@ -6,8 +6,9 @@
 
 #### Note:
 
-1. Including blank or marks other than "-" or "_" in sequence names would inference readin
-2. This app will never collected your sequence data
+1. Size larger than 30 Mb may not be applicable due to the limitation from free server. 
+2. Including blank or marks other than "-" or "_" in sequence names would inference readin
+3. This app will never collected your sequence data
 3. ...
 
 ***
