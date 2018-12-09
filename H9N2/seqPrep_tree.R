@@ -170,6 +170,33 @@ gt %<+% geoann + aes(color = I(colorr))
 
 
 
+# cladesampling 
+
+cladeSampling( trefile = "./H9_4982_clade.tre", fasfile = "./H9_4982.fasta", seed = 999, 
+               grid = 1.1, minBranchlth = TRUE, saveFasta = TRUE)
+
+s.tre <- read.nexus("./H9_1612_s")
+gt    <- ggtree(s.tre, ladderize = FALSE)
+
+
+
+geo.key = c( paste0( sA, collapse = "|"),
+             paste0( CN, collapse = "|"),
+             paste0( nA, collapse = "|"),
+             paste0( ME, collapse = "|"),
+             paste0( E, collapse = "|"),
+             paste0( A, collapse = "|"),
+             paste0( Na, collapse = "|"))
+
+col.key = c("#1a9850", "#91cf60", "#d9ef8b", "#fee08b", "#fc8d59", "#ffffbf", "#d73027")
+
+geoann <- findtaxa(type     = 1, 
+                   tree     = rawtre, 
+                   targetid = geo.key,
+                   target   = col.key)
+
+
+gt %<+% geoann + aes(color = I(colorr))
 
 
 
